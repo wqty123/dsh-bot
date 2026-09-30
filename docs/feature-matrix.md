@@ -1,7 +1,7 @@
 # 功能对照：实现了什么，还有什么没实现
 
 > 对照对象：`2026-ai-assistant-feature-matrix.md`（2026 主流 AI 个人助理 / Agent 功能对照调研）
-> 对照方式：逐条到代码里查符号，不凭记忆。生成这份表的脚本是 `dot-plugin/scripts/audit-against-research.mjs`，可重跑。
+> 对照方式：逐条到代码里查符号，不凭记忆。生成这份表的脚本是 `scripts/audit-against-research.mjs`，可重跑。
 > 结论：**19 条建议里，已实现 10、部分 5、未实现 4**。
 
 ---
