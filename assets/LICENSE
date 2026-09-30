@@ -1,0 +1,27 @@
+The character artwork in this directory is NOT covered by the MIT license
+that covers the plugin's source code. It is licensed separately and more
+restrictively.
+
+ATTRIBUTION (required by the license)
+  Character design : 上善无形  (original character "溟月")
+  DeepSeek styling : ZipZipPipe
+  Artifact cleanup : QYQCAMIAO
+
+LICENSE
+  CC BY-NC-SA 4.0 — https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+  You may share and adapt it if you:
+    1. give appropriate credit (the three names above),
+    2. use it for NON-COMMERCIAL purposes only,
+    3. share any derivative under the same license.
+
+FILES
+  whale-girl.png     original artwork (as published)
+  avatar-128.png     centre-cropped square, for the UI
+  avatar-256.png     centre-cropped square, larger
+  spritesheet.webp   animation frames, from the codex-pet-DeepSeek-girl project
+
+USING THIS PLUGIN COMMERCIALLY
+  Replace the files in this directory with artwork you hold the rights to.
+  The plugin does not depend on them: delete them, or point the "avatar path"
+  setting in the panel at your own image, and everything else keeps working.

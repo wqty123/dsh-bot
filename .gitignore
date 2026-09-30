@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+
+# Verification sandboxes. Each run creates its own throwaway DSH_HOME so a test
+# never touches the real profile's data; they are deleted on the next run but
+# survive an interrupted one.
+.verify-*/
+
+*.log
+.DS_Store
+Thumbs.db

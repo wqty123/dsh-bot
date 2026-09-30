@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # These two read only this repository, so they run anywhere.
+      #
+      # The main suite (tests/verify-dot-plugin.mjs, 224 checks) is deliberately
+      # NOT here: it loads the installed Harness's own schema validator, because
+      # a stub would happily agree with the plugin about a schema the host
+      # rejects — which is the one class of failure that suite exists to catch.
+      # Run it locally, where a Harness is installed:
+      #   node tests/verify-dot-plugin.mjs
+      - name: Client wiring
+        run: node scripts/check-client-wiring.mjs
+
+      - name: Research audit
+        run: node scripts/audit-against-research.mjs
+
+      - name: Syntax
+        run: |
+          node --check impl.js
+          node --check client.js
+          node --check entry.js
