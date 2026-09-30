@@ -412,14 +412,21 @@ window.__ModuleLoader__.load({
       '.dshdot-mark-more{display:inline-flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;margin-left:auto;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer;opacity:0}',
       '.dshdot-mark:hover .dshdot-mark-more,.dshdot-mark-more[aria-expanded="true"]{opacity:1}',
       '.dshdot-mark-more:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      // 照抄 DSH 的菜单卡片：无边框、用 elevation 阴影、从锚点右下方展开。
-      // 关键是 left:0 而不是 right:0 —— 侧边栏里这一行贴着左边，菜单也该
-      // 往右长；右对齐会让它探到面板外面去。
-      '.dshdot-mark-menu{position:absolute;top:calc(100% + 4px);left:0;z-index:100;box-sizing:border-box;display:flex;flex-direction:column;min-width:144px;max-width:360px;padding:4px;border:0;border-radius:var(--dsw-radius-md);background:var(--dsw-alias-bg-overlay);box-shadow:var(--dsw-elevation-prominent)}',
-      '.dshdot-mark-menu>span{display:flex;align-items:center;gap:6px;width:100%;min-height:34px;padding:6px 8px;font-size:13px;line-height:20px;color:var(--dsw-alias-label-primary);border-radius:var(--dsw-radius-md);cursor:pointer}',
+      // 菜单照 DSH 自己的规格：200px 起、16px 圆角、毛玻璃材质、30px 项高。
+      // 记下来是为了下次不用再量：容器是 flex 竖排 + 4px 内边距，材质单独一层
+      // （半透明底 + blur(40px) saturate(1.5)），不是把颜色直接涂在容器上。
+      // 颜色一律走 token，所以亮色主题不用改这里。
+      '.dshdot-mark-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:1100;box-sizing:border-box;display:flex;flex-direction:column;min-width:200px;max-width:360px;padding:4px;border:0;border-radius:var(--dsw-radius-lg);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 86%, transparent);backdrop-filter:blur(40px) saturate(1.5);box-shadow:var(--dsw-elevation-prominent)}',
+      '.dshdot-mark-menu>span{box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 8px;font-size:13px;line-height:20px;color:var(--dsw-alias-label-primary);border-radius:var(--dsw-radius-md);cursor:pointer}',
       '.dshdot-mark-menu>span:hover{background:var(--dsw-alias-interactive-bg-hover)}',
       '.dshdot-mark-menu>span[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
       '.dshdot-mark-menu>span[data-danger="true"]:hover{background:var(--dsw-alias-interactive-bg-hover-danger)}',
+      // 「删除」和其它项之间拉一条线：删掉是不可逆的，不该紧挨着「重命名」。
+      // 选择器必须写成 `.dshdot-mark-menu>.dshdot-mark-sep`：上面那条 `>span`
+      // 的特异性是 (0,1,1)，单写 `.dshdot-mark-sep` 是 (0,1,0)，会输 —— 于是
+      // 这条「1px 的线」被撑成和其它项一样的 30px。min-height/padding 一并覆盖，
+      // 免得以后再被哪条更具体的规则补回来。
+      '.dshdot-mark-menu>.dshdot-mark-sep{flex:none;width:auto;height:1px;min-height:1px;margin:3px 2px;padding:0;border:0;border-radius:0;background:var(--dsw-alias-border-l2)}',
       '.dshdot-mark-input{width:100%;min-width:0;padding:2px 6px;font:inherit;font-size:13px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:0.5px solid var(--dsw-alias-border-l4);border-radius:var(--dsw-radius-sm)}',
       '.dshdot-mark-input:focus-visible{outline:none;border-color:var(--dsw-alias-state-business-primary)}',
     ].join('');
@@ -531,7 +538,13 @@ window.__ModuleLoader__.load({
         }
 
         const markState = dotState(dot, unread);
-        return h("span", { className: "dshdot-mark" },
+        // 悬停开、移开收。菜单是这个 span 的子元素，所以鼠标从「更多」移到菜单上
+        // 时仍在 span 内，不会中途关掉 —— 这就是不需要给菜单单独挂事件的原因。
+        return h("span", {
+          className: "dshdot-mark",
+          onMouseEnter: () => setOpen(true),
+          onMouseLeave: () => setOpen(false),
+        },
           h("style", null, MARK_CSS),
           h("span", {
             className: "dshdot-mark-dot",
@@ -546,10 +559,10 @@ window.__ModuleLoader__.load({
             title: "更多",
             "aria-label": "更多",
             "aria-expanded": open,
-            onClick: (event) => {
-              event.stopPropagation();
-              setOpen((current) => !current);
-            },
+            // 开合交给悬停。这里再 toggle 一次的话：鼠标停上来已经把菜单打开了，
+            // 点一下反而把它关上 —— 而鼠标并没有离开，悬停不会再触发，菜单就停在
+            // 关着的状态不动了。所以点击只负责别冒泡到整行。
+            onClick: (event) => event.stopPropagation(),
           }, h(EllipsisIcon, { size: 16 })),
           open
             ? h("span", { className: "dshdot-mark-menu" },
@@ -569,6 +582,7 @@ window.__ModuleLoader__.load({
                     setRenaming(true);
                   },
                 }, "重命名"),
+                h("span", { className: "dshdot-mark-sep" }),
                 h("span", {
                   role: "menuitem",
                   "data-danger": "true",

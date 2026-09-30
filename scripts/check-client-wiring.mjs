@@ -61,8 +61,10 @@ check(
   "侧边栏那两处确实在 mark 上下文里",
   ellipsisLines.every((line) => {
     const at = lines.indexOf(line);
-    // 往回看它属于哪个 render：mark 的两个都有 setOpen / setMenu
-    return lines.slice(Math.max(0, at - 8), at).some((near) => near.includes("setOpen") || near.includes("setMenu"));
+    // 往回看它属于哪个 render。判据用 mark 自己的类名与菜单结构，不用 setOpen ——
+    // 开合改成悬停之后，点击那行旁边已经没有 setOpen 了。
+    return lines.slice(Math.max(0, at - 20), at)
+      .some((near) => near.includes("dshdot-mark-more") || near.includes("dshdot-mark-menu") || near.includes("setMenu"));
   }),
   "有一处三个点不在侧边栏的菜单里",
 );
