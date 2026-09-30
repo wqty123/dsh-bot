@@ -6,13 +6,8 @@
  */
 
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 
-/** Repository root — scripts/ sits directly under it. */
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-
-const source = readFileSync(join(ROOT, "client.js"), "utf8");
+const source = readFileSync("D:/dsh-workspace/dot-plugin/client.js", "utf8");
 const lines = source.split(/\r?\n/);
 
 let failures = 0;
@@ -98,9 +93,23 @@ check(
   "缩进还是 margin-left",
 );
 check(
-  "祖先链上撑开了两层，因为外壳的 glyph 容器与行之间还有一层",
-  source.includes(":has(> .dshdot-mark),:has(> :has(> .dshdot-mark))"),
-  "只有一层 :has()，撑到外壳的中间层就停了",
+  "祖先链上撑开了外壳的 glyph 容器",
+  source.includes("span:has(> * > .dshdot-mark)"),
+  "没有撑开外壳那一层，flex 就只到中间的无盒子 div 为止",
+);
+// 这条是实测出来的：Chromium 不支持 `:has()` 套在另一个 `:has()` 里面，整条规则
+// 会被**静默丢弃** —— 规则在文件里、看起来没问题、一点作用都没有。上一版就是
+// 这么写的，于是 glyph 一直停在 96px，`⋯` 停在行中间。
+//
+// 只看代码行：注释里为了说明这个坑，本身就要写出那个错误写法。
+const codeLines = lines.filter((line) => {
+  const trimmed = line.trim();
+  return !trimmed.startsWith("//") && !trimmed.startsWith("*") && !trimmed.startsWith("/*");
+});
+check(
+  "而且没有用嵌套的 :has()，那个写法不生效",
+  !codeLines.some((line) => /:has\([^()]*:has\(/.test(line)),
+  "有一处嵌套 :has()，浏览器会丢掉整条规则",
 );
 check(
   "页面内的设置按钮也靠右，但不是靠那三个点",

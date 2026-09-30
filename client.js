@@ -376,17 +376,19 @@ window.__ModuleLoader__.load({
     ];
 
     const MARK_CSS = [
-      // `:has(> ...)`: the shell wraps this in a `flex:none` glyph, so a
-      // percentage width would resolve against an indefinite box and collapse.
-      // Making the wrapper grow is what lets the row fill — and it avoids
-      // naming the shell's hashed class. `min-width` is the fallback for an
-      // engine without `:has()`.
+      // 外壳把这一行包在两层里：一个没有盒子的 `div`（`display:contents`）和一个
+      // `span`，撑开 span 才有用 —— `flex` 对 `display:contents` 的盒子无效。
       //
-      // Two levels, not one: the shell's own wrapper sits between the row and
-      // ours, and `flex` only reaches across one of them. With a single level
-      // the row grew to the wrapper's edge and stopped — which put the menu
-      // button mid-row instead of at the end of it.
-      ':has(> .dshdot-mark),:has(> :has(> .dshdot-mark)){flex:1 1 auto;min-width:0;width:100%}',
+      // 三件事是实测出来的，不是推出来的：
+      //
+      // 一、**不能写成嵌套的 `:has()`**（`:has(> :has(> .dshdot-mark))`）。Chromium
+      //     不支持 `:has()` 出现在另一个 `:has()` 里面，整条规则会被静默丢弃 ——
+      //     规则在、看起来没问题、一点作用都没有。
+      // 二、外层那个 span 的 `flex:0 0 auto` 来自外壳自己的类，把它改成 `1 1 auto`
+      //     是唯一有效的做法（`min-width:96px` 是它当时只有 96px 宽的原因）。
+      // 三、层数是外壳的实现细节，所以按 1/2/3 层各写一条并列规则，哪条命中都行 ——
+      //     外壳改一次层级，这里不该跟着坏。
+      'span:has(> .dshdot-mark),span:has(> * > .dshdot-mark),span:has(> * > * > .dshdot-mark){flex:1 1 auto;min-width:0;width:100%}',
       // 缩进一级，读起来像上一级条目的子项（下属文件夹 / 工作区下面的对话）。
       // 缩进的是整行，不是内容：行内仍然从左排起，不靠右对齐。
       //
