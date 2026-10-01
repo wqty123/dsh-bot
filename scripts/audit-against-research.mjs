@@ -6,6 +6,11 @@
  */
 
 import { readFileSync, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+/** Repository root — this file lives in `scripts/`, the plugin one level up. */
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const HOST = join(ROOT, "impl.js");
 const CLIENT = join(ROOT, "client.js");
