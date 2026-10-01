@@ -6,14 +6,14 @@
 ┌─ 宿主进程 ────────────────────────────────┐   ┌─ 浏览器 ────────────┐
 │  impl.js                                  │   │  client.js          │
 │   ├─ store        持久状态 + 串行写队列    │   │   ├─ 侧边栏条目      │
-│   ├─ 记忆文件层    $DSH_HOME/dot/memory/  │   │   ├─ bot 页面        │
+│   ├─ 记忆文件层    $DSH_HOME$DSH_HOME/bot/memory/  │   │   ├─ bot 页面        │
 │   ├─ 工作区判定    纯函数，无模型          │   │   └─ 设置页          │
 │   ├─ 执行器        可选，默认关            │   │                     │
 │   ├─ 审批闸门                             │   │  同一组 HTTP 路由    │
-│   ├─ 连接（入站/出站）                     │   │  /api/dot.state     │
-│   └─ MCP 客户端                           │   │  /api/dot.manage    │
-│                                           │   │  /api/dot.inbound   │
-│  7 个 dot_* 工具                           │   │  /api/dot.rewind    │
+│   ├─ 连接（入站/出站）                     │   │  /api/bot.state     │
+│   └─ MCP 客户端                           │   │  /api/bot.manage    │
+│                                           │   │  /api/bot.inbound   │
+│  7 个 bot_* 工具                           │   │  /api/bot.rewind    │
 └───────────────────────────────────────────┘   └─────────────────────┘
 ```
 
@@ -21,12 +21,12 @@
 
 ## store：为什么是串行的
 
-状态在一个 JSON 文件里（`$DSH_HOME/dot/dot.json`）。多个工具同一刻调用是常态 —— 两个 `dot_remember` 并发、一个 `dot_task` 和一次入站消息撞上。
+状态在一个 JSON 文件里（`$DSH_HOME$DSH_HOME/bot/bot.json`）。多个工具同一刻调用是常态 —— 两个 `bot_remember` 并发、一个 `bot_task` 和一次入站消息撞上。
 
 做法是**串行写队列 + 随机临时文件名 + 原子改名**：
 
 - 写操作排队，不并行落盘；
-- 每次写先落到 `dot.json.<random>.tmp`，再 `rename()` 覆盖 —— 改名在同一文件系统内是原子的，所以**读到的永远是完整的旧版本或完整的新版本**，不会是半个文件；
+- 每次写先落到 `bot.json.<random>.tmp`，再 `rename()` 覆盖 —— 改名在同一文件系统内是原子的，所以**读到的永远是完整的旧版本或完整的新版本**，不会是半个文件；
 - 随机后缀让两个进程同时写也不会互相覆盖临时文件。
 
 有一条测试专门验证这件事：两个写入同刻提交，两条都完整落盘且计数各自准确。
@@ -34,7 +34,7 @@
 ## 记忆文件层：分层就是策略
 
 ```
-$DSH_HOME/dot/memory/
+$DSH_HOME$DSH_HOME/bot/memory/
 ├── MEMORY.md            ← 根文件，全文进上下文
 ├── SOUL.md              ← 它是谁
 ├── USER.md              ← 用户是谁、在意什么
@@ -117,11 +117,11 @@ cannot get property "agentDefaultModel" without inject
 
 - `entry.js` 与 `impl.js` 的 `inject` 必须逐字一致；
 - 验证套件里有一条断言守着这件事；
-- `dot_status` 会打印当前生效的模型及其来源，让这句话在状态里就能被区分。
+- `bot_status` 会打印当前生效的模型及其来源，让这句话在状态里就能被区分。
 
 ## 客户端：一次轮询喂所有界面
 
-侧边栏的每个实例条目、bot 页面、设置页，**订阅同一次 `/api/dot.state` 轮询**（3 秒）。所以它们不会各说各话。
+侧边栏的每个实例条目、bot 页面、设置页，**订阅同一次 `/api/bot.state` 轮询**（3 秒）。所以它们不会各说各话。
 
 **样式归属也是刻意的**：侧边栏条目在侧边栏渲染时就要出现，而页面只在面板被选中时才渲染。所以条目**自带全部样式，内联**，不依赖任何可能还没挂载的样式表。
 
@@ -133,7 +133,7 @@ cannot get property "agentDefaultModel" without inject
 
 | 层 | 覆盖什么 | 跑法 |
 | --- | --- | --- |
-| `tests/verify-dot-plugin.mjs`（224 项） | 加载**真实** schema 验证器，端到端跑每个工具与路由 | 本地 |
+| `tests/verify-bot-plugin.mjs`（224 项） | 加载**真实** schema 验证器，端到端跑每个工具与路由 | 本地 |
 | `scripts/check-client-wiring.mjs`（25 项） | 「改了但没接上」——语法通过只说明文件能解析，不说明元素真的在渲染树里 | 任何地方 |
 | `scripts/audit-against-research.mjs` | 逐条到代码里查符号，回归「已实现 / 未实现」的判定 | 任何地方 |
 

@@ -1,5 +1,5 @@
 {
-  "name": "dsh-dot",
+  "name": "dsh-bot",
   "version": "1.0.0",
   "description": "Resident agent entity for DeepSeek Harness: bots that live outside any session, with their own instances, file-based memory you can open and edit, a task queue, an approval gate, and an optional background executor. Ships no platform integrations.",
   "type": "module",
@@ -40,11 +40,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wqty123/dsh-dot.git"
+    "url": "git+https://github.com/wqty123/dsh-bot.git"
   },
-  "homepage": "https://github.com/wqty123/dsh-dot",
+  "homepage": "https://github.com/wqty123/dsh-bot",
   "bugs": {
-    "url": "https://github.com/wqty123/dsh-dot/issues"
+    "url": "https://github.com/wqty123/dsh-bot/issues"
   },
   "engines": {
     "node": ">=22.19"

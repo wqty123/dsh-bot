@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/github/stars/wqty123/dsh-dot?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub stars">
+  <img src="https://img.shields.io/github/stars/wqty123/dsh-bot?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub stars">
   <img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat" alt="MIT License">
   <img src="https://img.shields.io/badge/DSH-Plugin-47848F?style=flat" alt="DeepSeek Harness plugin">
   <img src="https://img.shields.io/badge/Platform-Windows-4493F8?style=flat-square" alt="Platform: Windows (verified)">
@@ -15,7 +15,7 @@
 
 | Goal | Entry |
 | --- | --- |
-| Why this exists, and how it differs from "a session" | [Why a resident entity](docs/why-dot.md) |
+| Why this exists, and how it differs from "a session" | [Why a resident entity](docs/why-bot.md) |
 | Install, configure, day-to-day use | [User guide](docs/user-guide.md) |
 | All 7 tools: parameters, output, boundaries | [Tool reference](docs/tool-reference.md) |
 | How store / executor / memory tiers / approval gate fit together | [Architecture](docs/architecture.md) |
@@ -24,10 +24,10 @@
 
 ## What it is
 
-`dsh-dot` gives [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) a kind of agent that **belongs to no session**:
+`dsh-bot` gives [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) a kind of agent that **belongs to no session**:
 
-- **It outlives the conversation.** Close the session, compact the context, restart the machine — it is still there. Instances, memory, and the task queue live in `$DSH_HOME/dot/`, and every session reads and writes the same entity;
-- **Memory is a file you can open.** Not an invisible vector store, but a tree of `.md` files under `$DSH_HOME/dot/memory/`. Change one line and every later conversation follows it. Root files stay in context; subdirectories contribute only a name and one line of description;
+- **It outlives the conversation.** Close the session, compact the context, restart the machine — it is still there. Instances, memory, and the task queue live in `$DSH_HOME$DSH_HOME/bot/`, and every session reads and writes the same entity;
+- **Memory is a file you can open.** Not an invisible vector store, but a tree of `.md` files under `$DSH_HOME$DSH_HOME/bot/memory/`. Change one line and every later conversation follows it. Root files stay in context; subdirectories contribute only a name and one line of description;
 - **It moves things forward on its own.** A task queue plus an optional executor. Free time is **off by default**, and even when on it only acts when a **checkable condition** holds — its own queued work, an unanswered inbound message, a due reminder;
 - **It stops at the boundary.** Reaching outside the workspace parks the job in `awaiting` and **shows you the tool name and the full arguments**. You approve **one concrete action**, not a category.
 
@@ -42,22 +42,22 @@ The plugin installs into the profile you intend to use.
 dsh plugin --profile web add <path to this repo>
 
 # Or from npm, once published
-dsh plugin --profile web add dsh-dot
+dsh plugin --profile web add dsh-bot
 ```
 
 Then: a `bot` entry appears in the left sidebar. Open it and create an instance by type (companion / assistant / researcher / scribe are built in, and you can add your own), or step into one that already exists. The gear in the corner opens settings — memory, tasks, limits, connections, MCP servers, avatar, types.
 
-The agent then has 7 `dot_*` tools:
+The agent then has 7 `bot_*` tools:
 
 | Goal | Tool | Notes |
 | --- | --- | --- |
-| See what state it is in | `dot_status` | Instances, heartbeat, queue, the model in effect and where that choice came from |
-| Have it remember something | `dot_remember` | Writes into its own memory files, with an origin label |
-| Ask what it remembers | `dot_recall` | Word search; Chinese is split into bigrams |
-| Have it go do something | `dot_task` | Queue it, schedule it, repeat it, continue or start fresh |
-| Have it say something outward | `dot_connector` | Through a user-configured connection (Telegram / HTTP) |
-| Use a credential once | `dot_secret` | The value never enters context; it goes straight to a virtual desktop |
-| Remind it of a moment | `dot_agenda` | Fires through a connector when due |
+| See what state it is in | `bot_status` | Instances, heartbeat, queue, the model in effect and where that choice came from |
+| Have it remember something | `bot_remember` | Writes into its own memory files, with an origin label |
+| Ask what it remembers | `bot_recall` | Word search; Chinese is split into bigrams |
+| Have it go do something | `bot_task` | Queue it, schedule it, repeat it, continue or start fresh |
+| Have it say something outward | `bot_connector` | Through a user-configured connection (Telegram / HTTP) |
+| Use a credential once | `bot_secret` | The value never enters context; it goes straight to a virtual desktop |
+| Remind it of a moment | `bot_agenda` | Fires through a connector when due |
 
 Full list: [tool reference](#tool-reference).
 
@@ -67,7 +67,7 @@ Full list: [tool reference](#tool-reference).
   <tr>
     <td width="50%" valign="top">
       <h3>Memory is files, not a vector store</h3>
-      <p>Memory lives as a tree of <code>.md</code> files under <code>$DSH_HOME/dot/memory/</code> — visible, editable, and re-importable from disk in the settings page. <b>Root files (<code>MEMORY.md</code> / <code>SOUL.md</code> / <code>USER.md</code> / <code>MEMORY-CORE.md</code>) stay in context</b>; subdirectories contribute only a name and one line of description. The layering <i>is</i> the policy: moving a file between tiers is a file operation.</p>
+      <p>Memory lives as a tree of <code>.md</code> files under <code>$DSH_HOME$DSH_HOME/bot/memory/</code> — visible, editable, and re-importable from disk in the settings page. <b>Root files (<code>MEMORY.md</code> / <code>SOUL.md</code> / <code>USER.md</code> / <code>MEMORY-CORE.md</code>) stay in context</b>; subdirectories contribute only a name and one line of description. The layering <i>is</i> the policy: moving a file between tiers is a file operation.</p>
     </td>
     <td width="50%" valign="top">
       <h3>Every entry carries its origin</h3>
@@ -77,7 +77,7 @@ Full list: [tool reference](#tool-reference).
   <tr>
     <td width="50%" valign="top">
       <h3>Two gates for sensitive information</h3>
-      <p><b>Hard gate</b>: identity numbers, social security numbers, bank cards, passwords and keys, session tokens — <b>refused at every setting</b>, and it tells you the way around (use <code>dot_secret</code> rather than writing it down). <b>Soft gate</b>: health, finances, legal matters, family matters — excluded by default, one setting to allow, and anything kept <b>carries the label forever after</b>.</p>
+      <p><b>Hard gate</b>: identity numbers, social security numbers, bank cards, passwords and keys, session tokens — <b>refused at every setting</b>, and it tells you the way around (use <code>bot_secret</code> rather than writing it down). <b>Soft gate</b>: health, finances, legal matters, family matters — excluded by default, one setting to allow, and anything kept <b>carries the label forever after</b>.</p>
     </td>
     <td width="50%" valign="top">
       <h3>Memory has an age</h3>
@@ -146,19 +146,19 @@ Full list: [tool reference](#tool-reference).
 
 | Tool | Purpose | Reaches out |
 | --- | --- | --- |
-| `dot_status` | Instance list, heartbeat, queue, the model in effect and where it came from | – |
-| `dot_remember` | Record a durable entry (`text`, optional `kind` / `source`) | – |
-| `dot_recall` | Search memory by word (Chinese split into bigrams; filterable by kind) | – |
-| `dot_task` | Queue: add / schedule / repeat / continue-or-fresh / cancel | – |
-| `dot_connector` | Have the instance speak outward through a user connection | ✅ |
-| `dot_secret` | Deliver a credential into a virtual desktop (value never enters context) | ✅ |
-| `dot_agenda` | Note what should happen at a moment; fires through a connector | ✅ |
+| `bot_status` | Instance list, heartbeat, queue, the model in effect and where it came from | – |
+| `bot_remember` | Record a durable entry (`text`, optional `kind` / `source`) | – |
+| `bot_recall` | Search memory by word (Chinese split into bigrams; filterable by kind) | – |
+| `bot_task` | Queue: add / schedule / repeat / continue-or-fresh / cancel | – |
+| `bot_connector` | Have the instance speak outward through a user connection | ✅ |
+| `bot_secret` | Deliver a credential into a virtual desktop (value never enters context) | ✅ |
+| `bot_agenda` | Note what should happen at a moment; fires through a connector | ✅ |
 
-> "Reaches out" means data leaves the machine — the other four only read and write `$DSH_HOME/dot/`.
+> "Reaches out" means data leaves the machine — the other four only read and write `$DSH_HOME$DSH_HOME/bot/`.
 
 ### Where a memory lands
 
-`dot_remember` routes by kind: `focus` to `USER.md` (what the user cares about), `decision` and `fact` to `MEMORY-CORE.md`, everything else to `notes/YYYY-MM.md`. **That is policy, not implementation detail**: the files that stay in context hold only what can change behaviour.
+`bot_remember` routes by kind: `focus` to `USER.md` (what the user cares about), `decision` and `fact` to `MEMORY-CORE.md`, everything else to `notes/YYYY-MM.md`. **That is policy, not implementation detail**: the files that stay in context hold only what can change behaviour.
 
 ### How it reads its own memory
 
@@ -170,9 +170,9 @@ The plugin mounts through `cordis.patch.yml` as **a single row** (registered und
 
 | Location | Contents |
 | --- | --- |
-| `$DSH_HOME/dot/dot.json` | Instances, types, memory index, tasks, connections, MCP servers, limits, rules |
-| `$DSH_HOME/dot/memory/` | The memory itself (a tree of `.md` files, editable directly) |
-| `$DSH_HOME/dot/avatars/` | Uploaded avatar images |
+| `$DSH_HOME$DSH_HOME/bot/bot.json` | Instances, types, memory index, tasks, connections, MCP servers, limits, rules |
+| `$DSH_HOME$DSH_HOME/bot/memory/` | The memory itself (a tree of `.md` files, editable directly) |
+| `$DSH_HOME$DSH_HOME/bot/avatars/` | Uploaded avatar images |
 
 Settings sections: instances and types · memory · tasks and queue · free time · limits · rules · connections · MCP servers · avatar · agenda.
 
@@ -197,7 +197,7 @@ Settings sections: instances and types · memory · tasks and queue · free time
 
 ```
 Session side (model)   Host side (plugin)                  Disk
-  dot_* tools  ──→  handlers registered on ctx.tools  ──→  $DSH_HOME/dot/dot.json
+  bot_* tools  ──→  handlers registered on ctx.tools  ──→  $DSH_HOME$DSH_HOME/bot/bot.json
                         │                                     └─ memory/*.md
                         ├─→ executor (optional, off)           └─ avatars/
                         │     └─ queue → one model session → tool calls
@@ -205,13 +205,13 @@ Session side (model)   Host side (plugin)                  Disk
                         └─→ inbound connections (Telegram poll / HTTP endpoint)
 
 Web side (browser)     The same HTTP routes
-  sidebar entry  ──→  /api/dot.state (read-only poll, 3s)
-  bot page       ──→  /api/dot.manage (writes)
+  sidebar entry  ──→  /api/bot.state (read-only poll, 3s)
+  bot page       ──→  /api/bot.manage (writes)
   settings page  ──→  the same routes
 ```
 
 - **Both halves ship together**: `impl.js` is the host (store, executor, tools, routes), `client.js` is the web half (sidebar, page, settings). The client half registers through `window.__ModuleLoader__.load()` and imports no `@deepseek-ai/dsh-client-*` package;
-- **One poll feeds every surface**: every sidebar entry and the page subscribe to the same `/api/dot.state`, so they cannot contradict each other;
+- **One poll feeds every surface**: every sidebar entry and the page subscribe to the same `/api/bot.state`, so they cannot contradict each other;
 - **The workspace boundary is decidable**: `workspaceVerdict(toolName, args, workspace)` is a pure function returning `inside` / `guarded` / `refused` / `unchecked`. **`unchecked` is the important one** — "we checked and it was fine" and "there was nothing here to check" have to stay distinguishable in the code, or the former will impersonate the latter.
 
 ## Requirements
@@ -227,7 +227,7 @@ Web side (browser)     The same HTTP routes
 | DeepSeek Harness (dsh) | `0.2.0-rc.2` (peer range `>=0.2.0-rc.1 <0.3.0`) |
 | Node.js | `22.20.0` |
 | Operating system | Windows (10.0.26200) |
-| dsh-dot | `1.0.0` |
+| dsh-bot | `1.0.0` |
 
 > **Verified on Windows only** (macOS / Linux untested, not claimed). The host half has no platform-specific branches, but untested is untested.
 
@@ -243,7 +243,7 @@ Web side (browser)     The same HTTP routes
 - **Streamable HTTP only** for MCP transport; a stdio server needs a wrapper.
 - **Inbound defence is bounding and labelling, not content filtering.** The public record is unkind to detection-based defences (most were bypassed >90% under adaptive attack). So this picks the two that keep working: **bound the size, label the source**.
 - **Waivers match the exact tool name.** Changing one argument misses. That is the conservative side; the cost is being asked again for the same kind of operation with different arguments.
-- **`dot_secret` needs the virtual-desktop plugin** (`dsh-vdesktop`). Without it the tool says so plainly rather than failing silently.
+- **`bot_secret` needs the virtual-desktop plugin** (`dsh-vdesktop`). Without it the tool says so plainly rather than failing silently.
 
 ## Development
 
@@ -251,7 +251,7 @@ Plain JavaScript, no build step — `impl.js` / `client.js` / `entry.js` are wha
 
 ```sh
 # Offline verification suite (does not need dsh running)
-node tests/verify-dot-plugin.mjs
+node tests/verify-bot-plugin.mjs
 
 # Client wiring — run after touching the UI
 node scripts/check-client-wiring.mjs

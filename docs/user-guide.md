@@ -7,7 +7,7 @@
 dsh plugin --profile web add <本仓库路径>
 
 # 或从 npm
-dsh plugin --profile web add dsh-dot
+dsh plugin --profile web add dsh-bot
 ```
 
 装好后**刷新页面**。左侧栏出现 `bot` 条目 —— 那是这一组 bot 的入口。
@@ -52,7 +52,7 @@ dsh plugin --profile web add dsh-dot
 
 ### 它记在哪
 
-`$DSH_HOME/dot/memory/`。**是一棵 `.md` 文件树，你能直接编辑。**
+`$DSH_HOME$DSH_HOME/bot/memory/`。**是一棵 `.md` 文件树，你能直接编辑。**
 
 设置页的「记忆」栏里能看清单、能编辑、能从磁盘**重新导入**（在外部改完文件后点一下）。
 
@@ -100,7 +100,7 @@ notes/、以及你自己建的目录                        ← 只贡献名字�
 
 ### 从对话里
 
-直接说，它会用 `dot_task` 排上。
+直接说，它会用 `bot_task` 排上。
 
 ### 从设置页
 
@@ -197,8 +197,8 @@ notes/、以及你自己建的目录                        ← 只贡献名字�
 
 | 路径 | 内容 |
 | --- | --- |
-| `$DSH_HOME/dot/dot.json` | 实例、类型、记忆索引、任务、连接、MCP 服务、限额、规则 |
-| `$DSH_HOME/dot/memory/` | 记忆本体（`.md` 文件树） |
-| `$DSH_HOME/dot/avatars/` | 上传的头像 |
+| `$DSH_HOME$DSH_HOME/bot/bot.json` | 实例、类型、记忆索引、任务、连接、MCP 服务、限额、规则 |
+| `$DSH_HOME$DSH_HOME/bot/memory/` | 记忆本体（`.md` 文件树） |
+| `$DSH_HOME$DSH_HOME/bot/avatars/` | 上传的头像 |
 
 **备份就是复制这三个**。记忆是纯文本，换台机器带过去照样能用。

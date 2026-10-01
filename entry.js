@@ -1,5 +1,5 @@
 /**
- * Dot plugin entry point.
+ * Bot plugin entry point.
  *
  * This file is deliberately a thin, stable shell, and it should stay that way.
  * Cordis caches the entry module for the lifetime of the Host process and Node
@@ -10,12 +10,12 @@
  * module, an edited one loads fresh. Change `impl.js`, then disable and enable
  * the bundle to pick the change up.
  *
- * @module @local/dsh-dot
+ * @module dsh-bot
  */
 
 import { stat } from "node:fs/promises";
 
-export const name = "dot";
+export const name = "bot";
 /**
  * Declared here rather than in `impl.js` because Cordis reads the *entry*
  * module's exports: an `inject` living in the implementation would never be

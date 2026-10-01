@@ -6,8 +6,13 @@
  */
 
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const source = readFileSync("D:/dsh-workspace/dot-plugin/client.js", "utf8");
+/** Repository root — scripts/ sits directly under it. */
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const source = readFileSync(join(ROOT, "client.js"), "utf8");
 const lines = source.split(/\r?\n/);
 
 let failures = 0;
@@ -26,20 +31,20 @@ const count = (needle) => lines.filter((line) => line.includes(needle)).length;
 console.log("头像不再带状态环");
 check(
   "没有 data-tone 的边框规则了",
-  !source.includes('.dshdot-avatar[data-tone="ok"]{border-color'),
+  !source.includes('.dshbot-avatar[data-tone="ok"]{border-color'),
   "旧的绿色圆框规则还在",
 );
 check(
   "头像本身也不再画边框",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-avatar{"));
+    const rule = lines.find((line) => line.includes(".dshbot-avatar{"));
     return rule !== undefined && !rule.includes("border:");
   })(),
   "avatar 的规则里还有 border",
 );
 check(
   "但「这是谁」还是要显示的：overflow 收住圆角",
-  source.includes(".dshdot-avatar{position:relative") && source.includes("overflow:hidden"),
+  source.includes(".dshbot-avatar{position:relative") && source.includes("overflow:hidden"),
 );
 
 console.log("\n三个点在最右边");
@@ -64,24 +69,24 @@ check(
     // 往回看它属于哪个 render。判据用 mark 自己的类名与菜单结构，不用 setOpen ——
     // 开合改成悬停之后，点击那行旁边已经没有 setOpen 了。
     return lines.slice(Math.max(0, at - 20), at)
-      .some((near) => near.includes("dshdot-mark-more") || near.includes("dshdot-mark-menu") || near.includes("setMenu"));
+      .some((near) => near.includes("dshbot-mark-more") || near.includes("dshbot-mark-menu") || near.includes("setMenu"));
   }),
   "有一处三个点不在侧边栏的菜单里",
 );
 check(
   "而且被推到最右",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-mark-more{"));
+    const rule = lines.find((line) => line.includes(".dshbot-mark-more{"));
     return rule !== undefined && rule.includes("margin-left:auto");
   })(),
-  ".dshdot-mark-more 没有 margin-left:auto",
+  ".dshbot-mark-more 没有 margin-left:auto",
 );
 // 光有 margin-left:auto 不够：它把按钮推到「这一行的右端」，而如果这一行本身
 // 没有占满外壳给的位置，按钮就停在行中间——那正是它之前的样子。
 check(
   "但推得动的前提是这一行真的占满了外壳给的位置",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-mark{position:relative"));
+    const rule = lines.find((line) => line.includes(".dshbot-mark{position:relative"));
     return rule !== undefined && rule.includes("width:100%") && rule.includes("box-sizing:border-box");
   })(),
   "mark 没有 width:100%；margin-left:auto 会推到一个不含整行的盒子里",
@@ -89,14 +94,14 @@ check(
 check(
   "缩进用的是 padding 而不是 margin，否则那一百个百分比会把行推出容器",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-mark{position:relative"));
+    const rule = lines.find((line) => line.includes(".dshbot-mark{position:relative"));
     return rule !== undefined && rule.includes("padding-left:14px") && !rule.includes("margin-left:14px");
   })(),
   "缩进还是 margin-left",
 );
 check(
   "祖先链上撑开了外壳的 glyph 容器",
-  source.includes("span:has(> * > .dshdot-mark)"),
+  source.includes("span:has(> * > .dshbot-mark)"),
   "没有撑开外壳那一层，flex 就只到中间的无盒子 div 为止",
 );
 // 这条是实测出来的：Chromium 不支持 `:has()` 套在另一个 `:has()` 里面，整条规则
@@ -116,10 +121,10 @@ check(
 check(
   "页面内的设置按钮也靠右，但不是靠那三个点",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-icon{"));
+    const rule = lines.find((line) => line.includes(".dshbot-icon{"));
     return rule !== undefined && rule.includes("margin-left:auto");
   })(),
-  ".dshdot-icon 没有 margin-left:auto",
+  ".dshbot-icon 没有 margin-left:auto",
 );
 
 console.log("\n头像可以由用户上传");
@@ -145,13 +150,13 @@ check(
 console.log("\n输入框和 DSH 自己的形状一致");
 check(
   "是个卡片，不是一条横排的输入行",
-  source.includes('.dshdot-card{') && source.includes('.dshdot-composer{'),
+  source.includes('.dshbot-card{') && source.includes('.dshbot-composer{'),
   "缺 composer 或 card",
 );
 check(
   "宽度和聊天内容列共用一根轴，而不是撑满",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-card{"));
+    const rule = lines.find((line) => line.includes(".dshbot-card{"));
     if (rule === undefined) return false;
     // DSH 原式是 calc(clamp(680px, 列宽 * 0.64, 920px) + 32px)。
     return rule.includes("clamp(680px") && rule.includes("* 0.64") && rule.includes("+ 32px");
@@ -160,12 +165,12 @@ check(
 );
 check(
   "文字区在上、按钮行在下（两个子元素，不是一个 flex 行）",
-  source.includes('.dshdot-input{box-sizing:border-box') && source.includes('.dshdot-row{'),
+  source.includes('.dshbot-input{box-sizing:border-box') && source.includes('.dshbot-row{'),
 );
 check(
   "字号跟随 DSH 的内容字号 token，不是写死的",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-card{"));
+    const rule = lines.find((line) => line.includes(".dshbot-card{"));
     return rule !== undefined && rule.includes("--dsh-content-font-size");
   })(),
   "卡片没有继承 --dsh-content-font-size",
@@ -173,7 +178,7 @@ check(
 check(
   "发送是圆形，而且用了和 DSH 同一个填充 token",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-send{"));
+    const rule = lines.find((line) => line.includes(".dshbot-send{"));
     return rule !== undefined && rule.includes("999px") && rule.includes("--dsw-alias-button-info-fill");
   })(),
   "发送按钮不是圆形，或者没用 info-fill 那对颜色",
@@ -181,7 +186,7 @@ check(
 check(
   "输入框本体不再自己画边框和底色，那些属于卡片",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-input{box-sizing"));
+    const rule = lines.find((line) => line.includes(".dshbot-input{box-sizing"));
     return rule !== undefined && rule.includes("background:transparent") && rule.includes("border:none");
   })(),
   "input 还在画自己的边框或底色",
@@ -189,7 +194,7 @@ check(
 check(
   "而卡片自己带上了 DSH 的表面 token 与高度",
   (() => {
-    const rule = lines.find((line) => line.includes(".dshdot-card{"));
+    const rule = lines.find((line) => line.includes(".dshbot-card{"));
     return rule !== undefined
       && rule.includes("--dsw-specific-input-major")
       && rule.includes("--dsw-elevation-soft")

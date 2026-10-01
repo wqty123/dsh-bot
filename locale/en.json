@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Dot",
+    "title": "Bot",
     "description": "A resident agent that lives outside any session: its own instances, transcripts, shared memory and task queue, with an optional background executor. Ships no platform integrations — what it may reach is yours to configure."
   }
 }

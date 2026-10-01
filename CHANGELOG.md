@@ -10,13 +10,13 @@ store、实例与类型、任务队列、执行器、侧边栏条目、bot 页�
 
 ## 第二轮 —— 记忆从索引改成本体是文件
 
-原来记忆是 store 里的一个数组。改成 `$DSH_HOME/dot/memory/` 下的一棵 `.md` 文件树：
+原来记忆是 store 里的一个数组。改成 `$DSH_HOME$DSH_HOME/bot/memory/` 下的一棵 `.md` 文件树：
 
 - 根文件全文进上下文，子目录只贡献 `name` + `description`；
 - `MEMORY.md` 的存在本身就是「这一层是记忆」的声明；
 - 设置页读的是同一棵树，并从磁盘**重新导入**。
 
-**修掉一个真 bug**：第一次 `dot_remember` 把 `USER.md` 的 `name` / `description` 覆盖成了通用值 —— 因为写入在读文件时种子还不存在。修法是先 `ensureMemoryTree()`。回归测试断言 `name === "user"`。
+**修掉一个真 bug**：第一次 `bot_remember` 把 `USER.md` 的 `name` / `description` 覆盖成了通用值 —— 因为写入在读文件时种子还不存在。修法是先 `ensureMemoryTree()`。回归测试断言 `name === "user"`。
 
 ## 第三轮 —— 可治理性
 

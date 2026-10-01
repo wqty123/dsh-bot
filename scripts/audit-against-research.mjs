@@ -5,12 +5,7 @@
  * 具体符号：如果一条建议只有注释里的意图、没有对应的实现，那它就不算做了。
  */
 
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
-/** Repository root — scripts/ sits directly under it. */
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+import { readFileSync, existsSync } from "node:fs";
 
 const HOST = join(ROOT, "impl.js");
 const CLIENT = join(ROOT, "client.js");
@@ -29,7 +24,7 @@ const has = (needle) => both.includes(needle);
 
 // ── 必须有的（入场券） ──────────────────────────────────────────────
 
-add(1, "记忆是用户可读可改的对象", has("readMemoryTreeForPanel") && has("dot_remember") ? "done" : "missing",
+add(1, "记忆是用户可读可改的对象", has("readMemoryTreeForPanel") && has("bot_remember") ? "done" : "missing",
   has("renderMemoryFile") ? "记忆落成 .md 文件，面板读同一棵树" : "");
 
 add(2, "记忆随对话实时写入，不是事后总结", has("memoryTargetFor") ? "done" : "missing",

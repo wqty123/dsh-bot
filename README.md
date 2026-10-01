@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/github/stars/wqty123/dsh-dot?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub stars">
+  <img src="https://img.shields.io/github/stars/wqty123/dsh-bot?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub stars">
   <img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat" alt="MIT License">
   <img src="https://img.shields.io/badge/DSH-Plugin-47848F?style=flat" alt="DeepSeek Harness plugin">
   <img src="https://img.shields.io/badge/Platform-Windows-4493F8?style=flat-square" alt="Platform: Windows (verified)">
@@ -15,7 +15,7 @@
 
 | 目标 | 入口 |
 | --- | --- |
-| 了解插件为什么存在、和「会话」有什么不同 | [为什么做常驻实体](docs/why-dot.md) |
+| 了解插件为什么存在、和「会话」有什么不同 | [为什么做常驻实体](docs/why-bot.md) |
 | 安装、配置与日常使用 | [用户指南](docs/user-guide.md) |
 | 全部 7 个工具的参数、输出与示例 | [工具参考](docs/tool-reference.md) |
 | 了解 store / 执行器 / 记忆分层 / 审批闸门 | [架构说明](docs/architecture.md) |
@@ -24,10 +24,10 @@
 
 ## 这是什么
 
-`dsh-dot` 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 提供一种**不属于任何会话**的代理实体：
+`dsh-bot` 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 提供一种**不属于任何会话**的代理实体：
 
-- **它不属于某一次对话**：会话关掉、上下文压缩、机器重启，它都还在。实例、记忆、任务队列都在 `$DSH_HOME/dot/` 里，每个会话读写的都是同一份；
-- **记忆是你能打开的文件**：不是不可见的向量库，而是 `$DSH_HOME/dot/memory/` 下一棵 `.md` 文件树。改一处，之后每次对话都按新的来；根文件常驻上下文，子目录只在提示里贡献名字和一句话描述；
+- **它不属于某一次对话**：会话关掉、上下文压缩、机器重启，它都还在。实例、记忆、任务队列都在 `$DSH_HOME$DSH_HOME/bot/` 里，每个会话读写的都是同一份；
+- **记忆是你能打开的文件**：不是不可见的向量库，而是 `$DSH_HOME$DSH_HOME/bot/memory/` 下一棵 `.md` 文件树。改一处，之后每次对话都按新的来；根文件常驻上下文，子目录只在提示里贡献名字和一句话描述；
 - **它会自己推进事情**：一条任务队列 + 可选的执行器。自主时间**默认关闭**，打开后也只在**可检查的条件**成立时才动——队列里有自己的活、有没回应过的外部消息、有到点的日程；
 - **它在边界处停下等你**：需要动工作区外面的东西时，任务进入 `awaiting` 状态并**把工具名和完整参数摆给你看**。你批准的是**这一个动作**，不是一类动作。
 
@@ -42,22 +42,22 @@
 dsh plugin --profile web add <本仓库路径>
 
 # 或从 npm 安装（若已发布）
-dsh plugin --profile web add dsh-dot
+dsh plugin --profile web add dsh-bot
 ```
 
 装好后：左侧栏出现 `bot` 条目，点开就能按类型创建一个实例（内置伴侣 / 助手 / 研究员 / 记录员四种，也可以自己建），或者进入已有的。右上角齿轮进设置页，里面是记忆、任务、限额、连接、MCP 服务、头像、类型。
 
-安装后 agent 即可使用 7 个 `dot_*` 工具：
+安装后 agent 即可使用 7 个 `bot_*` 工具：
 
 | 想做什么 | 用哪个工具 | 说明 |
 | --- | --- | --- |
-| 看它现在什么状态 | `dot_status` | 实例、心跳、队列、当前模型与来源 |
-| 让它记住一件事 | `dot_remember` | 写进它自己的记忆文件，可标注来源 |
-| 问它记过什么 | `dot_recall` | 按词检索；中文按双字切分 |
-| 让它去做一件事 | `dot_task` | 排队、指定时间、循环、续跑或另起 |
-| 让它对外说一句话 | `dot_connector` | 经用户配置的连接（Telegram / HTTP）发出 |
-| 用一次凭据 | `dot_secret` | 值不进上下文，只送进虚拟桌面 |
-| 提醒它某个时刻 | `dot_agenda` | 到点经连接器提醒 |
+| 看它现在什么状态 | `bot_status` | 实例、心跳、队列、当前模型与来源 |
+| 让它记住一件事 | `bot_remember` | 写进它自己的记忆文件，可标注来源 |
+| 问它记过什么 | `bot_recall` | 按词检索；中文按双字切分 |
+| 让它去做一件事 | `bot_task` | 排队、指定时间、循环、续跑或另起 |
+| 让它对外说一句话 | `bot_connector` | 经用户配置的连接（Telegram / HTTP）发出 |
+| 用一次凭据 | `bot_secret` | 值不进上下文，只送进虚拟桌面 |
+| 提醒它某个时刻 | `bot_agenda` | 到点经连接器提醒 |
 
 完整清单见[工具参考](#工具参考)。
 
@@ -67,7 +67,7 @@ dsh plugin --profile web add dsh-dot
   <tr>
     <td width="50%" valign="top">
       <h3>记忆是文件，不是向量库</h3>
-      <p>记忆落在 <code>$DSH_HOME/dot/memory/</code> 下的 <code>.md</code> 文件树，设置页里能看、能改、能从磁盘重新导入。<b>根文件（<code>MEMORY.md</code> / <code>SOUL.md</code> / <code>USER.md</code> / <code>MEMORY-CORE.md</code>）常驻上下文</b>，子目录只在提示里贡献名字与一句话描述 —— 分层本身就是策略，移动一个文件就是改一层。</p>
+      <p>记忆落在 <code>$DSH_HOME$DSH_HOME/bot/memory/</code> 下的 <code>.md</code> 文件树，设置页里能看、能改、能从磁盘重新导入。<b>根文件（<code>MEMORY.md</code> / <code>SOUL.md</code> / <code>USER.md</code> / <code>MEMORY-CORE.md</code>）常驻上下文</b>，子目录只在提示里贡献名字与一句话描述 —— 分层本身就是策略，移动一个文件就是改一层。</p>
     </td>
     <td width="50%" valign="top">
       <h3>每条记忆带来源</h3>
@@ -77,7 +77,7 @@ dsh plugin --profile web add dsh-dot
   <tr>
     <td width="50%" valign="top">
       <h3>敏感信息分两道门</h3>
-      <p><b>硬门</b>：身份证号、社保号、银行卡号、密码密钥、会话令牌 —— <b>无论设置怎么调都拒绝</b>，并告诉你该怎么绕（用 <code>dot_secret</code>，而不是写下来）。<b>软门</b>：健康、财务、法律、家庭私事 —— 默认排除，改一个设置就能记，记了会<b>一直带着敏感标签</b>。</p>
+      <p><b>硬门</b>：身份证号、社保号、银行卡号、密码密钥、会话令牌 —— <b>无论设置怎么调都拒绝</b>，并告诉你该怎么绕（用 <code>bot_secret</code>，而不是写下来）。<b>软门</b>：健康、财务、法律、家庭私事 —— 默认排除，改一个设置就能记，记了会<b>一直带着敏感标签</b>。</p>
     </td>
     <td width="50%" valign="top">
       <h3>记忆有时效</h3>
@@ -146,19 +146,19 @@ dsh plugin --profile web add dsh-dot
 
 | 工具 | 用途 | 碰外部 |
 | --- | --- | --- |
-| `dot_status` | 实例清单、心跳、队列、当前生效的模型与来源 | – |
-| `dot_remember` | 记一条持久条目（`text` + 可选 `kind` / `source`） | – |
-| `dot_recall` | 按词检索记忆（中文按双字切分；可按类型筛选） | – |
-| `dot_task` | 任务队列：排队 / 指定时刻 / 循环 / 续跑或另起 / 取消 | – |
-| `dot_connector` | 让实例经用户的连接对外说话 | ✅ |
-| `dot_secret` | 把凭据送进虚拟桌面（值不进上下文） | ✅ |
-| `dot_agenda` | 记下一个时刻该做什么，到点经连接器提醒 | ✅ |
+| `bot_status` | 实例清单、心跳、队列、当前生效的模型与来源 | – |
+| `bot_remember` | 记一条持久条目（`text` + 可选 `kind` / `source`） | – |
+| `bot_recall` | 按词检索记忆（中文按双字切分；可按类型筛选） | – |
+| `bot_task` | 任务队列：排队 / 指定时刻 / 循环 / 续跑或另起 / 取消 | – |
+| `bot_connector` | 让实例经用户的连接对外说话 | ✅ |
+| `bot_secret` | 把凭据送进虚拟桌面（值不进上下文） | ✅ |
+| `bot_agenda` | 记下一个时刻该做什么，到点经连接器提醒 | ✅ |
 
-> 「碰外部」指该工具会让数据离开本机 —— 前四个只读写 `$DSH_HOME/dot/`。
+> 「碰外部」指该工具会让数据离开本机 —— 前四个只读写 `$DSH_HOME$DSH_HOME/bot/`。
 
 ### 记忆写在哪
 
-`dot_remember` 按类型落到不同文件：`focus` 进 `USER.md`（用户在意什么）、`decision` / `fact` 进 `MEMORY-CORE.md`、其余进 `notes/YYYY-MM.md`。**这不是实现细节，是策略**：常驻上下文的那几份只放最能改变行为的，其余按需检索。
+`bot_remember` 按类型落到不同文件：`focus` 进 `USER.md`（用户在意什么）、`decision` / `fact` 进 `MEMORY-CORE.md`、其余进 `notes/YYYY-MM.md`。**这不是实现细节，是策略**：常驻上下文的那几份只放最能改变行为的，其余按需检索。
 
 ### 它会怎么读自己的记忆
 
@@ -170,9 +170,9 @@ dsh plugin --profile web add dsh-dot
 
 | 位置 | 内容 |
 | --- | --- |
-| `$DSH_HOME/dot/dot.json` | 实例、类型、记忆索引、任务、连接、MCP 服务、限额、规则 |
-| `$DSH_HOME/dot/memory/` | 记忆本体（`.md` 文件树，可直接编辑） |
-| `$DSH_HOME/dot/avatars/` | 上传的头像文件 |
+| `$DSH_HOME$DSH_HOME/bot/bot.json` | 实例、类型、记忆索引、任务、连接、MCP 服务、限额、规则 |
+| `$DSH_HOME$DSH_HOME/bot/memory/` | 记忆本体（`.md` 文件树，可直接编辑） |
+| `$DSH_HOME$DSH_HOME/bot/avatars/` | 上传的头像文件 |
 
 设置页分这些栏目：实例与类型 · 记忆 · 任务与队列 · 自主时间 · 限额 · 规则 · 连接 · MCP 服务 · 头像 · 日程。
 
@@ -197,7 +197,7 @@ dsh plugin --profile web add dsh-dot
 
 ```
 会话侧（模型）          宿主侧（插件）                    磁盘
-  dot_* 工具  ──→  ctx.tools 注册的处理器  ──→  $DSH_HOME/dot/dot.json
+  bot_* 工具  ──→  ctx.tools 注册的处理器  ──→  $DSH_HOME$DSH_HOME/bot/bot.json
                         │                              └─ memory/*.md
                         ├─→ 执行器（可选，默认关）          └─ avatars/
                         │      └─ 任务队列 → 一次模型会话 → 工具调用
@@ -205,13 +205,13 @@ dsh plugin --profile web add dsh-dot
                         └─→ 入站连接（Telegram 长轮询 / HTTP 端点）
 
 Web 侧（浏览器）         同一条 HTTP 路由
-  侧边栏条目  ──→  /api/dot.state（只读轮询，3 秒）
-  bot 页面    ──→  /api/dot.manage（写操作）
+  侧边栏条目  ──→  /api/bot.state（只读轮询，3 秒）
+  bot 页面    ──→  /api/bot.manage（写操作）
   设置页      ──→  同一组路由
 ```
 
 - **两半都在一个包里**：`impl.js` 是宿主（store、执行器、工具、路由），`client.js` 是 Web 半（侧边栏、页面、设置）。客户端那半通过 `window.__ModuleLoader__.load()` 注册，不 import 任何 `@deepseek-ai/dsh-client-*` 包；
-- **一次轮询喂所有界面**：侧边栏的每个条目和页面订阅同一次 `/api/dot.state`，所以它们不会各说各话；
+- **一次轮询喂所有界面**：侧边栏的每个条目和页面订阅同一次 `/api/bot.state`，所以它们不会各说各话；
 - **工作区边界是可判定的**：`workspaceVerdict(toolName, args, workspace)` 是纯函数，返回 `inside` / `guarded` / `refused` / `unchecked`。**`unchecked` 是其中最重要的一个** —— 「查过了，没问题」和「这里没东西可查」必须在代码里分得开，否则前者会冒充后者。
 
 ## 环境要求
@@ -227,7 +227,7 @@ Web 侧（浏览器）         同一条 HTTP 路由
 | DeepSeek Harness（dsh） | `0.2.0-rc.2`（peer 声明 `>=0.2.0-rc.1 <0.3.0`） |
 | Node.js | `22.20.0` |
 | 操作系统 | Windows（10.0.26200） |
-| dsh-dot | `1.0.0` |
+| dsh-bot | `1.0.0` |
 
 > **当前仅在 Windows 环境实测**（macOS / Linux 未验证，暂不承诺）。宿主侧代码没有平台相关的分支，但没跑过就是没跑过。
 
@@ -243,8 +243,8 @@ Web 侧（浏览器）         同一条 HTTP 路由
 - **只支持 streamable HTTP 的 MCP 传输**：stdio 的服务需要用户自己套一层 HTTP。
 - **入站连接的注入防御是限长与标注，不是内容过滤**：公开记录对检测式防御很不客气（多数在攻击者适应后被绕过 90% 以上）。所以这里选了持续有效的两条：**限制大小、标明来源**。
 - **审批的豁免只匹配完全相同的工具名**：改一个参数就不算命中。这是保守的一侧，代价是同一类操作换个参数会再问一次。
-- **`dot_secret` 依赖虚拟桌面插件**（`dsh-vdesktop`）：没装时该工具会明确报错，而不是静默失败。
-- **没有现成的「会话内联操作」**：所有管理都在设置页，聊天里只能通过 `dot_*` 工具。
+- **`bot_secret` 依赖虚拟桌面插件**（`dsh-vdesktop`）：没装时该工具会明确报错，而不是静默失败。
+- **没有现成的「会话内联操作」**：所有管理都在设置页，聊天里只能通过 `bot_*` 工具。
 
 ## 开发
 
@@ -252,7 +252,7 @@ Web 侧（浏览器）         同一条 HTTP 路由
 
 ```sh
 # 离线验证套件（不需要 dsh 在跑）
-node verify-dot-plugin.mjs
+node verify-bot-plugin.mjs
 
 # 客户端接线检查（改了界面之后跑）
 node scripts/check-client-wiring.mjs

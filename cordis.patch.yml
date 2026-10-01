@@ -1,22 +1,3 @@
-# dsh-dot bundle patch: mounts the resident-agent entity into a profile
-# composition.
-#
-# Row names matter beyond loading: the host's client-module scan resolves a row's
-# specifier to a PACKAGE ROOT and reads `dsh.client` from there. A row named after
-# a subpath is not a package specifier and is skipped by design, which would leave
-# the bot panel permanently absent even though every tool works — hence a single
-# row under the bare package name, and no subpath rows at all.
-#
-# One row is enough here because both halves ship in this package: the Host half
-# (impl.js, declared by this row) owns the store, the executor, the tools and the
-# HTTP routes; the Web half (client.js, declared by `dsh.client` in package.json)
-# draws the sidebar entry, the bot page and the settings page.
-#
-# The row carries no config. Everything a user can change — instances, types,
-# memory, limits, connections, MCP servers, agreements — lives in
-# `$DSH_HOME/dot/` and is edited from the settings page, not from this file. A
-# profile that needs a different data directory can set DOT_HOME before starting
-# dsh; that is the only knob that belongs to deployment rather than to use.
 - insert:
-    - id: dsh-dot
-      name: dsh-dot
+    - id: dsh-bot
+      name: 'dsh-bot'

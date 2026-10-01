@@ -1,7 +1,7 @@
 /**
- * Dot — Web half.
+ * Bot — Web half.
  *
- * Dot is a resident entity, not a conversation, so it sits where resident
+ * A bot is a resident entity, not a conversation, so it sits where resident
  * things sit: an entry in the sidebar panel list, below "new session", that
  * opens its own page in the main column.
  *
@@ -16,13 +16,13 @@
  */
 
 window.__ModuleLoader__.load({
-  id: 'dsh-dot',
+  id: 'dsh-bot',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
     const { useCallback, useEffect, useRef, useState } = React;
 
-    const PANEL_ID = 'dot';
+    const PANEL_ID = 'bot';
     /** Each instance's sidebar entry and its panel are keyed by this prefix plus its id. */
     const PANEL_CHILD_PREFIX = 'bot:';
     const POLL_MS = 3000;
@@ -31,148 +31,148 @@ window.__ModuleLoader__.load({
 
     /** Only the page renders this; the entry must stay self-contained. */
     const CSS = [
-      '.dshdot{position:relative;display:flex;flex-direction:column;height:100%;min-height:0;background:var(--dsw-alias-bg-base)}',
-      '.dshdot-bar{display:flex;align-items:center;gap:12px;flex:none;padding:14px 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot{position:relative;display:flex;flex-direction:column;height:100%;min-height:0;background:var(--dsw-alias-bg-base)}',
+      '.dshbot-bar{display:flex;align-items:center;gap:12px;flex:none;padding:14px 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
       // 头像不带状态环了。一个 40px 的圆里套一圈 5px 的彩色边框，看上去像个指示灯，
       // 而这块地方要回答的是「这是谁」——状态在旁边那行字里说过了。
-      '.dshdot-avatar{position:relative;flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--dsw-alias-bg-layer-2)}',
-      '.dshdot-avatar[data-size="small"]{width:26px;height:26px}',
-      '.dshdot-who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}',
-      '.dshdot-name{margin:0;font-size:16px;font-weight:600;line-height:1.2;color:var(--dsw-alias-label-primary)}',
-      '.dshdot-state{margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;margin-left:auto;width:30px;height:30px;padding:0;border:none;border-radius:var(--dsw-radius-sm);background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer}',
-      '.dshdot-icon:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      '.dshdot-icon:active{background:var(--dsw-alias-interactive-bg-active)}',
-      '.dshdot-icon[aria-expanded="true"]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      '.dshdot-face{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;user-select:none}',
-      '@keyframes dshdot-breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.03)}}',
-      '.dshdot-avatar[data-live="true"]>img{animation:dshdot-breathe 3.6s ease-in-out infinite}',
-      '.dshdot-avatar[data-tone="warn"]>img{filter:grayscale(.7)}',
-      '.dshdot-avatar>img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;user-select:none}',
-      '.dshdot-code{display:inline-block;margin:0 2px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-radius:5px}',
-      '.dshdot-group{display:flex;flex-direction:column;gap:6px;margin-top:8px}',
-      '.dshdot-grouptitle{font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-btn[data-on="true"]{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}',
+      '.dshbot-avatar{position:relative;flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--dsw-alias-bg-layer-2)}',
+      '.dshbot-avatar[data-size="small"]{width:26px;height:26px}',
+      '.dshbot-who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}',
+      '.dshbot-name{margin:0;font-size:16px;font-weight:600;line-height:1.2;color:var(--dsw-alias-label-primary)}',
+      '.dshbot-state{margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;margin-left:auto;width:30px;height:30px;padding:0;border:none;border-radius:var(--dsw-radius-sm);background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer}',
+      '.dshbot-icon:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      '.dshbot-icon:active{background:var(--dsw-alias-interactive-bg-active)}',
+      '.dshbot-icon[aria-expanded="true"]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      '.dshbot-face{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;user-select:none}',
+      '@keyframes dshbot-breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.03)}}',
+      '.dshbot-avatar[data-live="true"]>img{animation:dshbot-breathe 3.6s ease-in-out infinite}',
+      '.dshbot-avatar[data-tone="warn"]>img{filter:grayscale(.7)}',
+      '.dshbot-avatar>img{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;user-select:none}',
+      '.dshbot-code{display:inline-block;margin:0 2px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-2);border-radius:5px}',
+      '.dshbot-group{display:flex;flex-direction:column;gap:6px;margin-top:8px}',
+      '.dshbot-grouptitle{font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-btn[data-on="true"]{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}',
       // 表单容器不是控件：用一条分隔线开头，不要拿框把它圈成一个盒子。
-      '.dshdot-connform{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-tool[data-on="true"]{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-2)}',
-      '.dshdot-typecard{position:relative;display:flex}',
-      '.dshdot-typecard>.dshdot-option{flex:1}',
-      '.dshdot-typecard-x{position:absolute;top:6px;right:6px;width:20px;height:20px;padding:0;font:inherit;font-size:14px;line-height:1;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:5px;cursor:pointer}',
-      '.dshdot-typecard-x:hover{color:var(--dsw-alias-state-error-primary);background:var(--dsw-alias-bg-layer-2)}',
-      '.dshdot-option[data-add="true"]{border-style:dashed}',
-      '.dshdot-numwrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-num{width:68px;height:28px;padding:0 6px;font:inherit;font-size:12px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:8px}',
-      '.dshdot-stream{display:flex;flex-direction:column;gap:18px;flex:1;min-height:0;padding:18px 20px;overflow-y:auto}',
-      '.dshdot-chat{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;padding:18px 20px;overflow-y:auto}',
-      '.dshdot-turn{max-width:min(640px,82%);padding:9px 13px;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:12px}',
-      '.dshdot-turn[data-role="user"]{align-self:flex-end;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-turn[data-role="dot"]{align-self:flex-start;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l1)}',
-      '.dshdot-think{align-self:flex-start;padding:9px 13px;font-size:13px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:12px}',
-      '.dshdot-empty{margin:auto;padding:20px;font-size:13px;text-align:center;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-err{flex:none;margin:0 20px 8px;padding:8px 12px;font-size:12px;color:var(--dsw-alias-state-error-primary);border:1px solid var(--dsw-alias-state-error-primary);border-radius:8px}',
-      '.dshdot-compose{display:flex;flex-direction:column;gap:8px;flex:none;padding:12px 20px 16px;border-top:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-panes{display:flex;align-items:center;gap:2px;flex:none;padding:0 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-pane{padding:8px 12px;font:inherit;font-size:13px;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer}',
-      '.dshdot-pane:hover{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}',
-      '.dshdot-pane[data-active="true"]{color:var(--dsw-alias-label-primary);border-bottom-color:var(--dsw-alias-brand-primary)}',
-      '.dshdot-tools{display:flex;align-items:center;gap:6px}',
-      '.dshdot-tool{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;min-width:28px;height:28px;padding:0 10px;font:inherit;font-size:12px;line-height:18px;white-space:nowrap;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
-      '.dshdot-tool:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      '.dshdot-tool:active:not([disabled]){background:var(--dsw-alias-interactive-bg-active)}',
-      '.dshdot-tool[disabled]{opacity:.4;cursor:not-allowed}',
-      '.dshdot-select{height:28px;max-width:220px;padding:0 6px;font:inherit;font-size:12px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:8px}',
-      '.dshdot-spacer{flex:1}',
-      '.dshdot-chips{display:flex;flex-wrap:wrap;gap:6px}',
+      '.dshbot-connform{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-tool[data-on="true"]{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-2)}',
+      '.dshbot-typecard{position:relative;display:flex}',
+      '.dshbot-typecard>.dshbot-option{flex:1}',
+      '.dshbot-typecard-x{position:absolute;top:6px;right:6px;width:20px;height:20px;padding:0;font:inherit;font-size:14px;line-height:1;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:5px;cursor:pointer}',
+      '.dshbot-typecard-x:hover{color:var(--dsw-alias-state-error-primary);background:var(--dsw-alias-bg-layer-2)}',
+      '.dshbot-option[data-add="true"]{border-style:dashed}',
+      '.dshbot-numwrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-num{width:68px;height:28px;padding:0 6px;font:inherit;font-size:12px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:8px}',
+      '.dshbot-stream{display:flex;flex-direction:column;gap:18px;flex:1;min-height:0;padding:18px 20px;overflow-y:auto}',
+      '.dshbot-chat{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;padding:18px 20px;overflow-y:auto}',
+      '.dshbot-turn{max-width:min(640px,82%);padding:9px 13px;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:12px}',
+      '.dshbot-turn[data-role="user"]{align-self:flex-end;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-turn[data-role="bot"]{align-self:flex-start;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);border:1px solid var(--dsw-alias-border-l1)}',
+      '.dshbot-think{align-self:flex-start;padding:9px 13px;font-size:13px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:12px}',
+      '.dshbot-empty{margin:auto;padding:20px;font-size:13px;text-align:center;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-err{flex:none;margin:0 20px 8px;padding:8px 12px;font-size:12px;color:var(--dsw-alias-state-error-primary);border:1px solid var(--dsw-alias-state-error-primary);border-radius:8px}',
+      '.dshbot-compose{display:flex;flex-direction:column;gap:8px;flex:none;padding:12px 20px 16px;border-top:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-panes{display:flex;align-items:center;gap:2px;flex:none;padding:0 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-pane{padding:8px 12px;font:inherit;font-size:13px;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer}',
+      '.dshbot-pane:hover{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}',
+      '.dshbot-pane[data-active="true"]{color:var(--dsw-alias-label-primary);border-bottom-color:var(--dsw-alias-brand-primary)}',
+      '.dshbot-tools{display:flex;align-items:center;gap:6px}',
+      '.dshbot-tool{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;min-width:28px;height:28px;padding:0 10px;font:inherit;font-size:12px;line-height:18px;white-space:nowrap;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
+      '.dshbot-tool:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      '.dshbot-tool:active:not([disabled]){background:var(--dsw-alias-interactive-bg-active)}',
+      '.dshbot-tool[disabled]{opacity:.4;cursor:not-allowed}',
+      '.dshbot-select{height:28px;max-width:220px;padding:0 6px;font:inherit;font-size:12px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:8px}',
+      '.dshbot-spacer{flex:1}',
+      '.dshbot-chips{display:flex;flex-wrap:wrap;gap:6px}',
       // 芯片靠底色区分，不描边——描边的圆胶囊看起来像按钮，而它只是个标记。
-      '.dshdot-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;font-size:12px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-interactive-bg-hover);border-radius:var(--dsw-radius-sm)}',
-      '.dshdot-chip-x{padding:0 4px;font:inherit;font-size:13px;line-height:1;color:var(--dsw-alias-label-secondary);background:transparent;border:none;cursor:pointer}',
-      '.dshdot-chip-x:hover{color:var(--dsw-alias-label-primary)}',
-      '.dshdot-trace{display:flex;flex-direction:column;flex:1;min-height:0}',
-      '.dshdot-trace-tools{display:flex;align-items:center;gap:14px;flex:none;padding:10px 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-tracestat{font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-trace-body{flex:1;min-height:0;padding:16px 20px;overflow-y:auto}',
-      '.dshdot-node{position:relative;padding:0 0 14px 24px}',
-      '.dshdot-node::before{content:"";position:absolute;left:5px;top:12px;bottom:0;width:1px;background:var(--dsw-alias-border-l1)}',
-      '.dshdot-node:last-child::before{display:none}',
-      '.dshdot-dot{position:absolute;left:1px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--dsw-alias-label-secondary);opacity:.55}',
-      '.dshdot-node[data-role="user"] .dshdot-dot{background:var(--dsw-alias-brand-primary);opacity:1}',
-      '.dshdot-node[data-role="dot"] .dshdot-dot{background:var(--dsw-alias-state-success-primary);opacity:1}',
-      '.dshdot-node[data-kind="turn"] .dshdot-dot{left:2px;top:6px;width:7px;height:7px;opacity:.4}',
-      '.dshdot-nodehead{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-nodehead b{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary)}',
-      '.dshdot-nodetext{margin-top:2px;font-size:12px;line-height:1.6;color:var(--dsw-alias-label-secondary);overflow-wrap:anywhere}',
-        '.dshdot-send{display:grid;place-items:center;flex:none;width:34px;height:34px;padding:0;border:none;border-radius:999px;background:var(--dsw-alias-button-info-fill);color:#fff;cursor:pointer;transition:background-color 100ms ease;transform:translateY(-2px)}',
-        '.dshdot-send:hover:not([disabled]){background:var(--dsw-alias-button-info-hover)}',
-        '.dshdot-send[disabled]{opacity:.4;cursor:default}',
+      '.dshbot-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;font-size:12px;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-interactive-bg-hover);border-radius:var(--dsw-radius-sm)}',
+      '.dshbot-chip-x{padding:0 4px;font:inherit;font-size:13px;line-height:1;color:var(--dsw-alias-label-secondary);background:transparent;border:none;cursor:pointer}',
+      '.dshbot-chip-x:hover{color:var(--dsw-alias-label-primary)}',
+      '.dshbot-trace{display:flex;flex-direction:column;flex:1;min-height:0}',
+      '.dshbot-trace-tools{display:flex;align-items:center;gap:14px;flex:none;padding:10px 20px;border-bottom:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-tracestat{font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-trace-body{flex:1;min-height:0;padding:16px 20px;overflow-y:auto}',
+      '.dshbot-node{position:relative;padding:0 0 14px 24px}',
+      '.dshbot-node::before{content:"";position:absolute;left:5px;top:12px;bottom:0;width:1px;background:var(--dsw-alias-border-l1)}',
+      '.dshbot-node:last-child::before{display:none}',
+      '.dshbot-dot{position:absolute;left:1px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--dsw-alias-label-secondary);opacity:.55}',
+      '.dshbot-node[data-role="user"] .dshbot-dot{background:var(--dsw-alias-brand-primary);opacity:1}',
+      '.dshbot-node[data-role="bot"] .dshbot-dot{background:var(--dsw-alias-state-success-primary);opacity:1}',
+      '.dshbot-node[data-kind="turn"] .dshbot-dot{left:2px;top:6px;width:7px;height:7px;opacity:.4}',
+      '.dshbot-nodehead{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-nodehead b{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary)}',
+      '.dshbot-nodetext{margin-top:2px;font-size:12px;line-height:1.6;color:var(--dsw-alias-label-secondary);overflow-wrap:anywhere}',
+        '.dshbot-send{display:grid;place-items:center;flex:none;width:34px;height:34px;padding:0;border:none;border-radius:999px;background:var(--dsw-alias-button-info-fill);color:#fff;cursor:pointer;transition:background-color 100ms ease;transform:translateY(-2px)}',
+        '.dshbot-send:hover:not([disabled]){background:var(--dsw-alias-button-info-hover)}',
+        '.dshbot-send[disabled]{opacity:.4;cursor:default}',
         // 输入区照 DSH 自己的形状做：一个卡片，宽度和聊天内容列共用同一根轴。
         // 宽度不一致是真实的成本——用户会以为这是两个不同的东西。
         // DSH 的原式是 calc(clamp(680px, 列宽 × 0.64, 920px) + 32px)，这里用
         // 容器宽度代替那个列宽变量，因为本插件拿不到对方的私有变量。
-        '.dshdot-composer{display:flex;flex-direction:column;align-items:center;flex:none;padding:0 16px 4px}',
-        '.dshdot-card{display:flex;flex-direction:column;gap:12px;box-sizing:border-box;width:100%;max-width:calc(clamp(680px, calc(100% * 0.64), 920px) + 32px);padding-top:8px;--dsw-elevation-stroke-color:var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-panel);background:var(--dsw-specific-input-major);box-shadow:var(--dsw-elevation-soft);font-size:var(--dsh-content-font-size,14px);line-height:calc(24px + var(--dsh-content-font-delta,0px))}',
-        '.dshdot-input{box-sizing:border-box;min-height:36px;max-height:var(--dshdot-text-max-height,160px);padding:4px 8px 0 14px;font-family:var(--dsw-font-family);font-size:inherit;line-height:inherit;color:var(--dsw-alias-label-primary);background:transparent;border:none;outline:none;resize:none;caret-color:var(--dsw-alias-state-business-primary)}',
-        '.dshdot-input::placeholder{color:var(--dsw-alias-label-caption)}',
-      '.dshdot-field+.dshdot-field{border-top:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-label{font-size:13px;font-weight:500;line-height:1.5;color:var(--dsw-alias-label-primary)}',
-      '.dshdot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}',
-      '.dshdot-option{display:flex;flex-direction:column;gap:3px;padding:11px 13px;text-align:left;font:inherit;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border:0.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md);cursor:pointer}',
-      '.dshdot-option:hover{background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-border-l4)}',
-      '.dshdot-option:active{background:var(--dsw-alias-interactive-bg-active)}',
-      '.dshdot-option[data-picked="true"]{border-color:var(--dsw-alias-brand-primary)}',
-      '.dshdot-option[disabled]{opacity:.4;cursor:not-allowed}',
-      '.dshdot-option b{font-size:13px;font-weight:600}',
-      '.dshdot-option span{font-size:12px;line-height:1.5;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-rows{display:flex;flex-direction:column;gap:2px}',
-      '.dshdot-rowitem{display:flex;flex-direction:column;border-radius:8px}',
-      '.dshdot-rowtop{display:flex;align-items:center;border-radius:8px}',
-      '.dshdot-rowitem:hover .dshdot-rowtop{background:var(--dsw-alias-bg-layer-2)}',
-      '.dshdot-rowitem[data-active="true"] .dshdot-rowtop{background:var(--dsw-alias-bg-layer-1)}',
-      '.dshdot-rowmain{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:8px 10px;font:inherit;font-size:13px;color:var(--dsw-alias-label-primary);text-align:left;background:transparent;border:none;cursor:pointer}',
-      '.dshdot-rowmark{flex:none;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-idle-primary);opacity:.45}',
-      '.dshdot-rowmark[data-state="new"]{background:var(--dsw-alias-state-success-primary);opacity:1}',
-      '.dshdot-rowmark[data-state="waiting"]{background:var(--dsw-alias-state-warn-primary);opacity:1}',
-      '.dshdot-rowmark[data-state="error"]{background:var(--dsw-alias-state-error-primary);opacity:1}',
-      '.dshdot-rowname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
-      '.dshdot-rowmeta{flex:none;font-size:12px;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-rowtime{flex:none;min-width:52px;font-size:12px;text-align:right;color:var(--dsw-alias-label-secondary)}',
-      '.dshdot-rowmore{display:inline-flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;margin-left:auto;margin-right:6px;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer;opacity:0}',
-      '.dshdot-rowitem:hover .dshdot-rowmore,.dshdot-rowmore[aria-expanded="true"]{opacity:1}',
-      '.dshdot-rowmore:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      '.dshdot-rowactions{display:flex;gap:4px;flex-wrap:wrap;padding:0 10px 8px}',
-      '.dshdot-rowactions button{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;font:inherit;font-size:12px;white-space:nowrap;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
-      '.dshdot-rowactions button:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      '.dshdot-rowactions button[disabled]{opacity:.4;cursor:not-allowed}',
-      '.dshdot-rowactions button[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
-      '.dshdot-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
-      '.dshdot-text{flex:1;min-width:140px;height:34px;padding:0 12px;font:inherit;font-size:13px;line-height:1.5;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:0.5px solid var(--dsw-alias-border-l4);border-radius:var(--dsw-radius-md)}',
-      '.dshdot-text:focus-visible{outline:none;border-color:var(--dsw-alias-state-business-primary)}',
-      '.dshdot-text::placeholder{color:var(--dsw-alias-label-dimmed)}',
-      '.dshdot-text:disabled{color:var(--dsw-alias-label-tertiary);cursor:default}',
-      '.dshdot-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;height:28px;padding:0 10px;font:inherit;font-size:12px;line-height:18px;white-space:nowrap;color:var(--dsw-alias-label-primary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
-      '.dshdot-btn:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover)}',
-      '.dshdot-btn:active:not([disabled]){background:var(--dsw-alias-interactive-bg-active)}',
-      '.dshdot-btn:focus-visible{outline:var(--dsw-focus-ring-width) solid var(--dsw-alias-state-business-primary);outline-offset:1px}',
-      '.dshdot-btn[disabled]{opacity:.4;cursor:not-allowed}',
-      '.dshdot-btn[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
-      '.dshdot-btn[data-on="true"]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+        '.dshbot-composer{display:flex;flex-direction:column;align-items:center;flex:none;padding:0 16px 4px}',
+        '.dshbot-card{display:flex;flex-direction:column;gap:12px;box-sizing:border-box;width:100%;max-width:calc(clamp(680px, calc(100% * 0.64), 920px) + 32px);padding-top:8px;--dsw-elevation-stroke-color:var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-panel);background:var(--dsw-specific-input-major);box-shadow:var(--dsw-elevation-soft);font-size:var(--dsh-content-font-size,14px);line-height:calc(24px + var(--dsh-content-font-delta,0px))}',
+        '.dshbot-input{box-sizing:border-box;min-height:36px;max-height:var(--dshbot-text-max-height,160px);padding:4px 8px 0 14px;font-family:var(--dsw-font-family);font-size:inherit;line-height:inherit;color:var(--dsw-alias-label-primary);background:transparent;border:none;outline:none;resize:none;caret-color:var(--dsw-alias-state-business-primary)}',
+        '.dshbot-input::placeholder{color:var(--dsw-alias-label-caption)}',
+      '.dshbot-field+.dshbot-field{border-top:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-label{font-size:13px;font-weight:500;line-height:1.5;color:var(--dsw-alias-label-primary)}',
+      '.dshbot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}',
+      '.dshbot-option{display:flex;flex-direction:column;gap:3px;padding:11px 13px;text-align:left;font:inherit;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border:0.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-md);cursor:pointer}',
+      '.dshbot-option:hover{background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-border-l4)}',
+      '.dshbot-option:active{background:var(--dsw-alias-interactive-bg-active)}',
+      '.dshbot-option[data-picked="true"]{border-color:var(--dsw-alias-brand-primary)}',
+      '.dshbot-option[disabled]{opacity:.4;cursor:not-allowed}',
+      '.dshbot-option b{font-size:13px;font-weight:600}',
+      '.dshbot-option span{font-size:12px;line-height:1.5;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-rows{display:flex;flex-direction:column;gap:2px}',
+      '.dshbot-rowitem{display:flex;flex-direction:column;border-radius:8px}',
+      '.dshbot-rowtop{display:flex;align-items:center;border-radius:8px}',
+      '.dshbot-rowitem:hover .dshbot-rowtop{background:var(--dsw-alias-bg-layer-2)}',
+      '.dshbot-rowitem[data-active="true"] .dshbot-rowtop{background:var(--dsw-alias-bg-layer-1)}',
+      '.dshbot-rowmain{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:8px 10px;font:inherit;font-size:13px;color:var(--dsw-alias-label-primary);text-align:left;background:transparent;border:none;cursor:pointer}',
+      '.dshbot-rowmark{flex:none;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-idle-primary);opacity:.45}',
+      '.dshbot-rowmark[data-state="new"]{background:var(--dsw-alias-state-success-primary);opacity:1}',
+      '.dshbot-rowmark[data-state="waiting"]{background:var(--dsw-alias-state-warn-primary);opacity:1}',
+      '.dshbot-rowmark[data-state="error"]{background:var(--dsw-alias-state-error-primary);opacity:1}',
+      '.dshbot-rowname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.dshbot-rowmeta{flex:none;font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-rowtime{flex:none;min-width:52px;font-size:12px;text-align:right;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-rowmore{display:inline-flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;margin-left:auto;margin-right:6px;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer;opacity:0}',
+      '.dshbot-rowitem:hover .dshbot-rowmore,.dshbot-rowmore[aria-expanded="true"]{opacity:1}',
+      '.dshbot-rowmore:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      '.dshbot-rowactions{display:flex;gap:4px;flex-wrap:wrap;padding:0 10px 8px}',
+      '.dshbot-rowactions button{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;font:inherit;font-size:12px;white-space:nowrap;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
+      '.dshbot-rowactions button:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      '.dshbot-rowactions button[disabled]{opacity:.4;cursor:not-allowed}',
+      '.dshbot-rowactions button[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
+      '.dshbot-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
+      '.dshbot-text{flex:1;min-width:140px;height:34px;padding:0 12px;font:inherit;font-size:13px;line-height:1.5;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:0.5px solid var(--dsw-alias-border-l4);border-radius:var(--dsw-radius-md)}',
+      '.dshbot-text:focus-visible{outline:none;border-color:var(--dsw-alias-state-business-primary)}',
+      '.dshbot-text::placeholder{color:var(--dsw-alias-label-dimmed)}',
+      '.dshbot-text:disabled{color:var(--dsw-alias-label-tertiary);cursor:default}',
+      '.dshbot-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;height:28px;padding:0 10px;font:inherit;font-size:12px;line-height:18px;white-space:nowrap;color:var(--dsw-alias-label-primary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer}',
+      '.dshbot-btn:hover:not([disabled]){background:var(--dsw-alias-interactive-bg-hover)}',
+      '.dshbot-btn:active:not([disabled]){background:var(--dsw-alias-interactive-bg-active)}',
+      '.dshbot-btn:focus-visible{outline:var(--dsw-focus-ring-width) solid var(--dsw-alias-state-business-primary);outline-offset:1px}',
+      '.dshbot-btn[disabled]{opacity:.4;cursor:not-allowed}',
+      '.dshbot-btn[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
+      '.dshbot-btn[data-on="true"]{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
       // 说明文字不是控件：不给框，也不给圆角。一个框意味着"可以输入"或者
       // "可以点"，而这里两样都不是——那正是设置页看起来又挤又吵的原因。
-      '.dshdot-note{margin:0;font-size:12px;line-height:1.6;color:var(--dsw-alias-label-tertiary)}',
+      '.dshbot-note{margin:0;font-size:12px;line-height:1.6;color:var(--dsw-alias-label-tertiary)}',
       // 列表同理：用细横线分隔，不用外框把它包成一个盒子。
-      '.dshdot-list{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}',
-      '.dshdot-item{display:flex;gap:10px;align-items:baseline;padding:6px 0;font-size:13px;color:var(--dsw-alias-label-primary);border-top:0.5px solid var(--dsw-alias-border-l2)}',
-      '.dshdot-item:first-child{border-top:none}',
+      '.dshbot-list{display:flex;flex-direction:column;margin:0;padding:0;list-style:none}',
+      '.dshbot-item{display:flex;gap:10px;align-items:baseline;padding:6px 0;font-size:13px;color:var(--dsw-alias-label-primary);border-top:0.5px solid var(--dsw-alias-border-l2)}',
+      '.dshbot-item:first-child{border-top:none}',
       // 标签是注记，不是按钮：只靠字号和颜色区分，不描边。
-      '.dshdot-tag{flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}',
+      '.dshbot-tag{flex:none;font-size:11px;color:var(--dsw-alias-label-tertiary)}',
       // 状态点：绿 = 测过且通过，红 = 测过且失败，灰 = 还没测过。
       // 三态而不是两态——一个只该被扫一眼的灯，不能把「没看过」说成「没问题」。
-      '.dshdot-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--dsw-alias-label-dimmed);margin-right:6px}',
-      '.dshdot-dot-ok{background:var(--dsw-alias-state-business-primary)}',
-      '.dshdot-dot-error{background:var(--dsw-alias-state-error-primary)}',
-      '.dshdot-overlay{display:flex;flex-direction:column;gap:18px;flex:1;min-height:0;padding:20px 24px;overflow-y:auto;background:var(--dsw-alias-bg-base)}',
-      '.dshdot-overlay-head{display:flex;align-items:center;gap:12px}',
-      '.dshdot-h1{margin:0;flex:1;font-size:16px;font-weight:600;color:var(--dsw-alias-label-primary)}',
+      '.dshbot-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--dsw-alias-label-dimmed);margin-right:6px}',
+      '.dshbot-dot-ok{background:var(--dsw-alias-state-business-primary)}',
+      '.dshbot-dot-error{background:var(--dsw-alias-state-error-primary)}',
+      '.dshbot-overlay{display:flex;flex-direction:column;gap:18px;flex:1;min-height:0;padding:20px 24px;overflow-y:auto;background:var(--dsw-alias-bg-base)}',
+      '.dshbot-overlay-head{display:flex;align-items:center;gap:12px}',
+      '.dshbot-h1{margin:0;flex:1;font-size:16px;font-weight:600;color:var(--dsw-alias-label-primary)}',
     ].join('');
 
     /** Absolute age of an ISO instant, phrased for a status line. */
@@ -198,7 +198,7 @@ window.__ModuleLoader__.load({
     }
 
     async function loadTypes() {
-      const response = await fetch("/api/dot.types", { cache: "no-store", headers: { accept: "application/json" } });
+      const response = await fetch("/api/bot.types", { cache: "no-store", headers: { accept: "application/json" } });
       const value = await response.json();
       return Array.isArray(value.types) ? value.types : [];
     }
@@ -217,8 +217,8 @@ window.__ModuleLoader__.load({
     function ServiceDot(props) {
       const state = props.state;
       const label = state === "ok" ? "测过，正常" : state === "error" ? "测过，失败" : "还没测过";
-      const extra = state === "ok" ? " dshdot-dot-ok" : state === "error" ? " dshdot-dot-error" : "";
-      return h("span", { className: "dshdot-dot" + extra, title: label });
+      const extra = state === "ok" ? " dshbot-dot-ok" : state === "error" ? " dshbot-dot-error" : "";
+      return h("span", { className: "dshbot-dot" + extra, title: label });
     }
 
     /** 一个服务条目的健康状态，从它自己记录的两件事推出来。 */
@@ -285,7 +285,7 @@ window.__ModuleLoader__.load({
       return snapshot.dots.find((entry) => entry.id === id);
     }
 
-    const SEEN_KEY = "dshdot.seen";
+    const SEEN_KEY = "dshbot.seen";
 
     function readSeen() {
       try {
@@ -381,14 +381,14 @@ window.__ModuleLoader__.load({
       //
       // 三件事是实测出来的，不是推出来的：
       //
-      // 一、**不能写成嵌套的 `:has()`**（`:has(> :has(> .dshdot-mark))`）。Chromium
+      // 一、**不能写成嵌套的 `:has()`**（`:has(> :has(> .dshbot-mark))`）。Chromium
       //     不支持 `:has()` 出现在另一个 `:has()` 里面，整条规则会被静默丢弃 ——
       //     规则在、看起来没问题、一点作用都没有。
       // 二、外层那个 span 的 `flex:0 0 auto` 来自外壳自己的类，把它改成 `1 1 auto`
       //     是唯一有效的做法（`min-width:96px` 是它当时只有 96px 宽的原因）。
       // 三、层数是外壳的实现细节，所以按 1/2/3 层各写一条并列规则，哪条命中都行 ——
       //     外壳改一次层级，这里不该跟着坏。
-      'span:has(> .dshdot-mark),span:has(> * > .dshdot-mark),span:has(> * > * > .dshdot-mark){flex:1 1 auto;min-width:0;width:100%}',
+      'span:has(> .dshbot-mark),span:has(> * > .dshbot-mark),span:has(> * > * > .dshbot-mark){flex:1 1 auto;min-width:0;width:100%}',
       // 缩进一级，读起来像上一级条目的子项（下属文件夹 / 工作区下面的对话）。
       // 缩进的是整行，不是内容：行内仍然从左排起，不靠右对齐。
       //
@@ -396,39 +396,40 @@ window.__ModuleLoader__.load({
       // resolved to; the flex growth above is what gives it something to be a
       // hundred percent *of*.
       // 缩进用 padding 而不是 margin：这个盒子是 width:100% 满宽的，margin 会把它推到容器外 14px，右边就短了一截。
-      '.dshdot-mark{position:relative;display:flex;flex:1 1 auto;box-sizing:border-box;width:100%;align-items:center;gap:8px;min-width:96px;padding-left:14px}',
-      '.dshdot-mark-face{position:relative;flex:none;width:18px;height:18px;border-radius:50%;background:var(--dsw-alias-bg-layer-2)}',
-      '.dshdot-mark-ping{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-success-primary);border:2px solid var(--dsw-alias-bg-base)}',
+      '.dshbot-mark{position:relative;display:flex;flex:1 1 auto;box-sizing:border-box;width:100%;align-items:center;gap:8px;min-width:96px;padding-left:14px}',
+      '.dshbot-mark-face{position:relative;flex:none;width:18px;height:18px;border-radius:50%;background:var(--dsw-alias-bg-layer-2)}',
+      '.dshbot-mark-ping{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-success-primary);border:2px solid var(--dsw-alias-bg-base)}',
       // 状态点三态：绿=有新消息，橙=等你回答（规则拦下了活儿），红=出错了，灰=安静。
-      '.dshdot-mark-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-idle-primary);opacity:.5}',
-      '.dshdot-mark-dot[data-state="new"]{background:var(--dsw-alias-state-success-primary);opacity:1}',
-      '.dshdot-mark-dot[data-state="waiting"]{background:var(--dsw-alias-state-warn-primary);opacity:1}',
-      '.dshdot-mark-dot[data-state="error"]{background:var(--dsw-alias-state-error-primary);opacity:1}',
+      '.dshbot-mark-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-state-idle-primary);opacity:.5}',
+      '.dshbot-mark-dot[data-state="new"]{background:var(--dsw-alias-state-success-primary);opacity:1}',
+      '.dshbot-mark-dot[data-state="waiting"]{background:var(--dsw-alias-state-warn-primary);opacity:1}',
+      '.dshbot-mark-dot[data-state="error"]{background:var(--dsw-alias-state-error-primary);opacity:1}',
       // `min-width` 是刻意的保险：外层一旦塌掉，名字至少保住两个字宽，
       // 而不是被压成一条竖线（那正是这个行之前出过的故障）。
-      '.dshdot-mark-name{flex:1 1 auto;min-width:2.5em;overflow:hidden;font-size:14px;text-overflow:ellipsis;white-space:nowrap}',
-      '.dshdot-mark-time{flex:none;font-size:12px;color:var(--dsw-alias-label-secondary)}',
+      '.dshbot-mark-name{flex:1 1 auto;min-width:2.5em;overflow:hidden;font-size:14px;text-overflow:ellipsis;white-space:nowrap}',
+      '.dshbot-mark-time{flex:none;font-size:12px;color:var(--dsw-alias-label-secondary)}',
       // 「更多」钉死在行尾：margin-left:auto 把它推到最右边，与名字宽度无关。
-      '.dshdot-mark-more{display:inline-flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;margin-left:auto;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer;opacity:0}',
-      '.dshdot-mark:hover .dshdot-mark-more,.dshdot-mark-more[aria-expanded="true"]{opacity:1}',
-      '.dshdot-mark-more:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
-      // 菜单照 DSH 自己的规格：200px 起、16px 圆角、毛玻璃材质、30px 项高。
+      '.dshbot-mark-more{display:inline-flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;margin-left:auto;color:var(--dsw-alias-label-secondary);background:transparent;border:none;border-radius:var(--dsw-radius-sm);cursor:pointer;opacity:0}',
+      '.dshbot-mark:hover .dshbot-mark-more,.dshbot-mark-more[aria-expanded="true"]{opacity:1}',
+      '.dshbot-mark-more:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}',
+      // 菜单照 DSH 自己的规格：16px 圆角、毛玻璃材质、30px 项高。宽度没有照抄它的 200px ——
+// 那个宽度是留给分组小标题和右侧快捷键列的，这里只有三项短文字，200px 会空出一大截。
       // 记下来是为了下次不用再量：容器是 flex 竖排 + 4px 内边距，材质单独一层
       // （半透明底 + blur(40px) saturate(1.5)），不是把颜色直接涂在容器上。
       // 颜色一律走 token，所以亮色主题不用改这里。
-      '.dshdot-mark-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:1100;box-sizing:border-box;display:flex;flex-direction:column;min-width:200px;max-width:360px;padding:4px;border:0;border-radius:var(--dsw-radius-lg);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 86%, transparent);backdrop-filter:blur(40px) saturate(1.5);box-shadow:var(--dsw-elevation-prominent)}',
-      '.dshdot-mark-menu>span{box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 8px;font-size:13px;line-height:20px;color:var(--dsw-alias-label-primary);border-radius:var(--dsw-radius-md);cursor:pointer}',
-      '.dshdot-mark-menu>span:hover{background:var(--dsw-alias-interactive-bg-hover)}',
-      '.dshdot-mark-menu>span[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
-      '.dshdot-mark-menu>span[data-danger="true"]:hover{background:var(--dsw-alias-interactive-bg-hover-danger)}',
+      '.dshbot-mark-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:1100;box-sizing:border-box;display:flex;flex-direction:column;min-width:140px;max-width:360px;padding:4px;border:0;border-radius:var(--dsw-radius-lg);background:color-mix(in srgb, var(--dsw-alias-bg-layer-2) 86%, transparent);backdrop-filter:blur(40px) saturate(1.5);box-shadow:var(--dsw-elevation-prominent)}',
+      '.dshbot-mark-menu>span{box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 8px;font-size:13px;line-height:20px;color:var(--dsw-alias-label-primary);border-radius:var(--dsw-radius-md);cursor:pointer}',
+      '.dshbot-mark-menu>span:hover{background:var(--dsw-alias-interactive-bg-hover)}',
+      '.dshbot-mark-menu>span[data-danger="true"]{color:var(--dsw-alias-state-error-primary)}',
+      '.dshbot-mark-menu>span[data-danger="true"]:hover{background:var(--dsw-alias-interactive-bg-hover-danger)}',
       // 「删除」和其它项之间拉一条线：删掉是不可逆的，不该紧挨着「重命名」。
-      // 选择器必须写成 `.dshdot-mark-menu>.dshdot-mark-sep`：上面那条 `>span`
-      // 的特异性是 (0,1,1)，单写 `.dshdot-mark-sep` 是 (0,1,0)，会输 —— 于是
+      // 选择器必须写成 `.dshbot-mark-menu>.dshbot-mark-sep`：上面那条 `>span`
+      // 的特异性是 (0,1,1)，单写 `.dshbot-mark-sep` 是 (0,1,0)，会输 —— 于是
       // 这条「1px 的线」被撑成和其它项一样的 30px。min-height/padding 一并覆盖，
       // 免得以后再被哪条更具体的规则补回来。
-      '.dshdot-mark-menu>.dshdot-mark-sep{flex:none;width:auto;height:1px;min-height:1px;margin:3px 2px;padding:0;border:0;border-radius:0;background:var(--dsw-alias-border-l2)}',
-      '.dshdot-mark-input{width:100%;min-width:0;padding:2px 6px;font:inherit;font-size:13px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:0.5px solid var(--dsw-alias-border-l4);border-radius:var(--dsw-radius-sm)}',
-      '.dshdot-mark-input:focus-visible{outline:none;border-color:var(--dsw-alias-state-business-primary)}',
+      '.dshbot-mark-menu>.dshbot-mark-sep{flex:none;width:auto;height:1px;min-height:1px;margin:3px 2px;padding:0;border:0;border-radius:0;background:var(--dsw-alias-border-l2)}',
+      '.dshbot-mark-input{width:100%;min-width:0;padding:2px 6px;font:inherit;font-size:13px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-3);border:0.5px solid var(--dsw-alias-border-l4);border-radius:var(--dsw-radius-sm)}',
+      '.dshbot-mark-input:focus-visible{outline:none;border-color:var(--dsw-alias-state-business-primary)}',
     ].join('');
 
     /**
@@ -440,7 +441,7 @@ window.__ModuleLoader__.load({
     function loadAvatar(force) {
       if (avatarCache.started && !force) return;
       avatarCache.started = true;
-      fetch("/api/dot.avatar", { cache: "no-store", headers: { accept: "image/*" } })
+      fetch("/api/bot.avatar", { cache: "no-store", headers: { accept: "image/*" } })
         .then((response) => (response.ok ? response.blob() : null))
         .then((blob) => {
           if (blob === null) return;
@@ -509,7 +510,7 @@ window.__ModuleLoader__.load({
         const stop = (event) => event.stopPropagation();
         const act = (body) => {
           setOpen(false);
-          call("/api/dot.manage", body)
+          call("/api/bot.manage", body)
             .then(() => refreshLive())
             .catch(() => {});
         };
@@ -521,10 +522,10 @@ window.__ModuleLoader__.load({
         };
 
         if (renaming) {
-          return h("span", { className: "dshdot-mark" },
+          return h("span", { className: "dshbot-mark" },
             h("style", null, MARK_CSS),
             h("input", {
-              className: "dshdot-mark-input",
+              className: "dshbot-mark-input",
               value,
               autoFocus: true,
               onClick: stop,
@@ -541,20 +542,20 @@ window.__ModuleLoader__.load({
         // 悬停开、移开收。菜单是这个 span 的子元素，所以鼠标从「更多」移到菜单上
         // 时仍在 span 内，不会中途关掉 —— 这就是不需要给菜单单独挂事件的原因。
         return h("span", {
-          className: "dshdot-mark",
+          className: "dshbot-mark",
           onMouseEnter: () => setOpen(true),
           onMouseLeave: () => setOpen(false),
         },
           h("style", null, MARK_CSS),
           h("span", {
-            className: "dshdot-mark-dot",
+            className: "dshbot-mark-dot",
             "data-state": markState,
             title: DOT_STATE_LABEL[markState],
           }),
-          h("span", { className: "dshdot-mark-name" }, dot.name),
-          dot.messages === 0 ? null : h("span", { className: "dshdot-mark-time" }, shortAgo(dot.updatedAt)),
+          h("span", { className: "dshbot-mark-name" }, dot.name),
+          dot.messages === 0 ? null : h("span", { className: "dshbot-mark-time" }, shortAgo(dot.updatedAt)),
           h("span", {
-            className: "dshdot-mark-more",
+            className: "dshbot-mark-more",
             role: "button",
             title: "更多",
             "aria-label": "更多",
@@ -565,7 +566,7 @@ window.__ModuleLoader__.load({
             onClick: (event) => event.stopPropagation(),
           }, h(EllipsisIcon, { size: 16 })),
           open
-            ? h("span", { className: "dshdot-mark-menu" },
+            ? h("span", { className: "dshbot-mark-menu" },
                 h("span", {
                   role: "menuitem",
                   onClick: (event) => {
@@ -582,7 +583,7 @@ window.__ModuleLoader__.load({
                     setRenaming(true);
                   },
                 }, "重命名"),
-                h("span", { className: "dshdot-mark-sep" }),
+                h("span", { className: "dshbot-mark-sep" }),
                 h("span", {
                   role: "menuitem",
                   "data-danger": "true",
@@ -655,7 +656,7 @@ window.__ModuleLoader__.load({
         setBusy(typeId);
         setError(null);
         try {
-          const result = await call("/api/dot.manage", { action: "create", type: typeId });
+          const result = await call("/api/bot.manage", { action: "create", type: typeId });
           if (result.error !== undefined) setError(result.error);
           else await onCreated();
         } catch (failure) {
@@ -671,7 +672,7 @@ window.__ModuleLoader__.load({
         setBusy(body.id);
         setError(null);
         try {
-          const result = await call("/api/dot.manage", body);
+          const result = await call("/api/bot.manage", body);
           if (result.error !== undefined) setError(result.error);
           else await onChanged();
         } catch (failure) {
@@ -694,30 +695,30 @@ window.__ModuleLoader__.load({
         await run({ action: "rename", id, name });
       };
 
-      return h("div", { className: "dshdot" },
+      return h("div", { className: "dshbot" },
         h("style", null, CSS),
-        h("div", { className: "dshdot-bar" },
-          h("span", { className: "dshdot-avatar", "data-tone": toneOf(state) }),
-          h("div", { className: "dshdot-who" },
-            h("h1", { className: "dshdot-name" }, "bot"),
-            h("p", { className: "dshdot-state" },
+        h("div", { className: "dshbot-bar" },
+          h("span", { className: "dshbot-avatar", "data-tone": toneOf(state) }),
+          h("div", { className: "dshbot-who" },
+            h("h1", { className: "dshbot-name" }, "bot"),
+            h("p", { className: "dshbot-state" },
               state.kind === "error" ? "读不到 Host 端状态，插件可能已停用。" : "新建一个，或者回到已有的")),
           h("button", {
             type: "button",
-            className: "dshdot-icon",
+            className: "dshbot-icon",
             title: "设置",
             "aria-label": "设置",
             disabled: snapshot.dots.length === 0,
             onClick: onSettings,
           }, h(GearIcon, null))),
-        h("div", { className: "dshdot-stream" },
-          h("div", { className: "dshdot-field" },
-            h("span", { className: "dshdot-label" }, "新建"),
-            h("div", { className: "dshdot-grid" },
-              types.map((type) => h("div", { key: type.id, className: "dshdot-typecard" },
+        h("div", { className: "dshbot-stream" },
+          h("div", { className: "dshbot-field" },
+            h("span", { className: "dshbot-label" }, "新建"),
+            h("div", { className: "dshbot-grid" },
+              types.map((type) => h("div", { key: type.id, className: "dshbot-typecard" },
                 h("button", {
                   type: "button",
-                  className: "dshdot-option",
+                  className: "dshbot-option",
                   disabled: busy !== null,
                   onClick: () => create(type.id),
                 },
@@ -727,7 +728,7 @@ window.__ModuleLoader__.load({
                   ? null
                   : h("button", {
                       type: "button",
-                      className: "dshdot-typecard-x",
+                      className: "dshbot-typecard-x",
                       title: "删除这个类型",
                       "aria-label": "删除这个类型",
                       disabled: busy !== null,
@@ -735,7 +736,7 @@ window.__ModuleLoader__.load({
                     }, "×"))),
               h("button", {
                 type: "button",
-                className: "dshdot-option",
+                className: "dshbot-option",
                 "data-add": "true",
                 disabled: busy !== null,
                   onClick: () => setTypeForm(typeForm === null ? { name: "", blurb: "", persona: "", editing: null } : null),
@@ -744,11 +745,11 @@ window.__ModuleLoader__.load({
                 h("span", null, "自己起名、写说明和人设")))),
           typeForm === null
             ? null
-            : h("div", { className: "dshdot-field" },
+            : h("div", { className: "dshbot-field" },
                   // 同一个表单既建新类型、也改已有的：两件事要填的东西一模一样，
                   // 分两个表单只会让它们慢慢长得不一样。
                   types.length === 0 ? null : h("select", {
-                    className: "dshdot-select",
+                    className: "dshbot-select",
                     value: typeForm.editing ?? "",
                     onChange: (event) => {
                       const picked = types.find((entry) => entry.id === event.target.value);
@@ -759,31 +760,31 @@ window.__ModuleLoader__.load({
                   },
                     h("option", { value: "" }, "新建一个类型"),
                     types.map((entry) => h("option", { key: entry.id, value: entry.id }, "改：" + entry.name))),
-                h("span", { className: "dshdot-label" }, "类型"),
+                h("span", { className: "dshbot-label" }, "类型"),
                 h("input", {
-                  className: "dshdot-text",
+                  className: "dshbot-text",
                   value: typeForm.name,
                   autoFocus: true,
                   placeholder: "名字，比如「审稿人」",
                   onChange: (event) => setTypeForm({ ...typeForm, name: event.target.value }),
                 }),
                 h("input", {
-                  className: "dshdot-text",
+                  className: "dshbot-text",
                   value: typeForm.blurb,
                   placeholder: "一句话说明，显示在卡片上",
                   onChange: (event) => setTypeForm({ ...typeForm, blurb: event.target.value }),
                 }),
                 h("textarea", {
-                  className: "dshdot-input",
+                  className: "dshbot-input",
                   rows: 3,
                   value: typeForm.persona,
                   placeholder: "人设：它该怎么说话、按什么原则办事。留空会用一句默认的。",
                   onChange: (event) => setTypeForm({ ...typeForm, persona: event.target.value }),
                 }),
-                h("div", { className: "dshdot-row" },
+                h("div", { className: "dshbot-row" },
                   h("button", {
                     type: "button",
-                    className: "dshdot-btn",
+                    className: "dshbot-btn",
                     disabled: busy !== null || typeForm.name.trim().length === 0,
                     onClick: () => {
                       const draft = typeForm;
@@ -796,23 +797,23 @@ window.__ModuleLoader__.load({
                   }, "保存类型"),
                   h("button", {
                     type: "button",
-                    className: "dshdot-btn",
+                    className: "dshbot-btn",
                     onClick: () => setTypeForm(null),
                   }, "取消"))),
           snapshot.dots.length === 0
             ? null
-            : h("div", { className: "dshdot-field" },
-                h("span", { className: "dshdot-label" }, "已有的"),
-                h("div", { className: "dshdot-rows" }, snapshot.dots.map((dot) => h("div", {
+            : h("div", { className: "dshbot-field" },
+                h("span", { className: "dshbot-label" }, "已有的"),
+                h("div", { className: "dshbot-rows" }, snapshot.dots.map((dot) => h("div", {
                   key: dot.id,
-                  className: "dshdot-rowitem",
+                  className: "dshbot-rowitem",
                   "data-active": String(dot.id === snapshot.activeDotId),
                 },
-                  h("div", { className: "dshdot-rowtop" },
+                  h("div", { className: "dshbot-rowtop" },
                     renaming === dot.id
-                      ? h("div", { className: "dshdot-rowmain" },
+                      ? h("div", { className: "dshbot-rowmain" },
                           h("input", {
-                            className: "dshdot-text",
+                            className: "dshbot-text",
                             value: renameValue,
                             autoFocus: true,
                             onChange: (event) => setRenameValue(event.target.value),
@@ -823,33 +824,33 @@ window.__ModuleLoader__.load({
                           }),
                           h("button", {
                             type: "button",
-                            className: "dshdot-btn",
+                            className: "dshbot-btn",
                             onClick: () => commitRename(dot.id),
                           }, "保存"))
                       : h("button", {
                           type: "button",
-                          className: "dshdot-rowmain",
+                          className: "dshbot-rowmain",
                           title: dot.name,
                           onClick: () => onEnter(dot.id),
                         },
                           h("span", {
-                            className: "dshdot-rowmark",
+                            className: "dshbot-rowmark",
                             "data-state": dotState(dot, isUnread(dot)),
                             title: DOT_STATE_LABEL[dotState(dot, isUnread(dot))],
                           }),
-                          h("span", { className: "dshdot-rowname" }, dot.name),
-                          h("span", { className: "dshdot-rowmeta" }, typeName(types, dot.type)),
-                          h("span", { className: "dshdot-rowtime" }, shortAgo(dot.updatedAt))),
+                          h("span", { className: "dshbot-rowname" }, dot.name),
+                          h("span", { className: "dshbot-rowmeta" }, typeName(types, dot.type)),
+                          h("span", { className: "dshbot-rowtime" }, shortAgo(dot.updatedAt))),
                     h("button", {
                       type: "button",
-                      className: "dshdot-rowmore",
+                      className: "dshbot-rowmore",
                       title: "更多",
                       "aria-label": "更多",
                       "aria-expanded": menu === dot.id,
                       onClick: () => setMenu((value) => (value === dot.id ? null : dot.id)),
                     }, h(EllipsisIcon, { size: 16 }))),
                   menu === dot.id
-                    ? h("div", { className: "dshdot-rowactions" },
+                    ? h("div", { className: "dshbot-rowactions" },
                         h("button", {
                           type: "button",
                           disabled: busy === dot.id,
@@ -868,9 +869,9 @@ window.__ModuleLoader__.load({
                           onClick: () => run({ action: "delete", id: dot.id }),
                         }, "删除"))
                     : null)))),
-          h("div", { className: "dshdot-note" },
+          h("div", { className: "dshbot-note" },
             "新建的 bot 默认叫「屿」，进去之后可以在设置里改名。名字、类型和对话各自独立，记忆和队列是全体共享的。"),
-          error === null ? null : h("div", { className: "dshdot-err", style: { margin: 0 } }, error)));
+          error === null ? null : h("div", { className: "dshbot-err", style: { margin: 0 } }, error)));
     }
 
     function ChatView(props) {
@@ -901,7 +902,7 @@ window.__ModuleLoader__.load({
       // pin one; otherwise it follows whatever the default is at call time.
       useEffect(() => {
         let alive = true;
-        fetch("/api/dot.models", { cache: "no-store", headers: { accept: "application/json" } })
+        fetch("/api/bot.models", { cache: "no-store", headers: { accept: "application/json" } })
           .then((response) => response.json())
           .then((value) => {
             if (alive) setCatalog(value);
@@ -930,9 +931,9 @@ window.__ModuleLoader__.load({
       };
 
       const changeModel = (value) => {
-        if (value === "") return quiet("/api/dot.manage", { action: "model", id: dotId, model: null });
+        if (value === "") return quiet("/api/bot.manage", { action: "model", id: dotId, model: null });
         const cut = value.indexOf("|");
-        return quiet("/api/dot.manage", {
+        return quiet("/api/bot.manage", {
           action: "model",
           id: dotId,
           model: { provider: value.slice(0, cut), model: value.slice(cut + 1) },
@@ -962,7 +963,7 @@ window.__ModuleLoader__.load({
         setSending(true);
         setError(null);
         try {
-          const result = await call("/api/dot.chat", {
+          const result = await call("/api/bot.chat", {
             text: text.length === 0 ? "（见附件）" : text,
             dotId,
             attachments: riding,
@@ -994,84 +995,84 @@ window.__ModuleLoader__.load({
       const needle = query.trim();
       const keep = (message) => needle.length === 0 || message.text.includes(needle);
 
-      return h("div", { className: "dshdot" },
+      return h("div", { className: "dshbot" },
         h("style", null, CSS),
-        h("div", { className: "dshdot-bar" },
-          h("button", { type: "button", className: "dshdot-icon", title: "回到 bot", "aria-label": "回到 bot", onClick: onHome },
+        h("div", { className: "dshbot-bar" },
+          h("button", { type: "button", className: "dshbot-icon", title: "回到 bot", "aria-label": "回到 bot", onClick: onHome },
             h(BackIcon, null)),
           h("span", {
-            className: "dshdot-avatar",
+            className: "dshbot-avatar",
             "data-tone": toneOf(state),
             "data-size": "small",
             // A paused resident holds still; the breathing is the "it is alive" cue.
             "data-live": String(current !== null && current.paused !== true),
           },
-            h(DotFace, { className: "dshdot-face" })),
-          h("div", { className: "dshdot-who" },
-            h("h1", { className: "dshdot-name" }, current === null ? "屿" : current.name),
-            h("p", { className: "dshdot-state" },
+            h(DotFace, { className: "dshbot-face" })),
+          h("div", { className: "dshbot-who" },
+            h("h1", { className: "dshbot-name" }, current === null ? "屿" : current.name),
+            h("p", { className: "dshbot-state" },
               "心跳 " + ago(snapshot.heartbeatAt)
               + " · " + typeName(types, current === null ? "" : current.type)
               + " · " + messages.length + " 条消息"
               + (snapshot.stats.taskQueued > 0 ? " · " + snapshot.stats.taskQueued + " 件在排队" : "")
               + (snapshot.worker !== undefined && snapshot.worker.state === "running" ? " · 正在做活" : ""))),
-          h("button", { type: "button", className: "dshdot-icon", title: "新建 bot", "aria-label": "新建 bot", onClick: onNew },
+          h("button", { type: "button", className: "dshbot-icon", title: "新建 bot", "aria-label": "新建 bot", onClick: onNew },
             h("span", { style: { fontSize: "17px", lineHeight: 1 } }, "＋")),
-          h("button", { type: "button", className: "dshdot-icon", title: "设置", "aria-label": "设置", onClick: onSettings },
+          h("button", { type: "button", className: "dshbot-icon", title: "设置", "aria-label": "设置", onClick: onSettings },
               h(GearIcon, null))),
-        h("div", { className: "dshdot-panes" },
+        h("div", { className: "dshbot-panes" },
           h("button", {
             type: "button",
-            className: "dshdot-pane",
+            className: "dshbot-pane",
             "data-active": String(pane === "chat"),
             onClick: () => setPane("chat"),
           }, "对话"),
           h("button", {
             type: "button",
-            className: "dshdot-pane",
+            className: "dshbot-pane",
             "data-active": String(pane === "trace"),
             onClick: () => setPane("trace"),
           }, "轨迹")),
         pane === "chat"
-          ? h("div", { className: "dshdot-chat", ref: streamRef },
+          ? h("div", { className: "dshbot-chat", ref: streamRef },
               messages.length === 0 && !sending
-                ? h("div", { className: "dshdot-empty" }, "还没有对话。说第一句话吧。")
+                ? h("div", { className: "dshbot-empty" }, "还没有对话。说第一句话吧。")
                 : messages.map((message) => h("div", {
                     key: message.id,
-                    className: "dshdot-turn",
+                    className: "dshbot-turn",
                     "data-role": message.role,
                   }, message.text)),
-              sending ? h("div", { className: "dshdot-think" }, "正在想…") : null)
-          : h("div", { className: "dshdot-trace" },
-              h("div", { className: "dshdot-trace-tools" },
-                h("span", { className: "dshdot-tracestat" }, "总耗时 " + totalMs + " ms"),
-                h("span", { className: "dshdot-tracestat" }, turns.length + " 轮"),
-                h("span", { className: "dshdot-tracestat" }, calls + " 次调用"),
-                h("span", { className: "dshdot-spacer" }),
+              sending ? h("div", { className: "dshbot-think" }, "正在想…") : null)
+          : h("div", { className: "dshbot-trace" },
+              h("div", { className: "dshbot-trace-tools" },
+                h("span", { className: "dshbot-tracestat" }, "总耗时 " + totalMs + " ms"),
+                h("span", { className: "dshbot-tracestat" }, turns.length + " 轮"),
+                h("span", { className: "dshbot-tracestat" }, calls + " 次调用"),
+                h("span", { className: "dshbot-spacer" }),
                 h("input", {
-                  className: "dshdot-text",
+                  className: "dshbot-text",
                   style: { maxWidth: "220px" },
                   value: query,
                   placeholder: "搜索…",
                   onChange: (event) => setQuery(event.target.value),
                 })),
-              h("div", { className: "dshdot-trace-body" },
+              h("div", { className: "dshbot-trace-body" },
                 turns.length === 0
-                  ? h("div", { className: "dshdot-empty" }, "还没有可看的记录；说过话之后这里会有每一轮的模型、耗时和用量。")
+                  ? h("div", { className: "dshbot-empty" }, "还没有可看的记录；说过话之后这里会有每一轮的模型、耗时和用量。")
                   : turns.map((turn) => {
                       const items = turn.items.filter(keep);
                       if (items.length === 0) return null;
                       return h("div", { key: turn.index },
-                        h("div", { className: "dshdot-node", "data-kind": "turn" },
-                          h("span", { className: "dshdot-dot" }),
-                          h("div", { className: "dshdot-nodehead" }, h("b", null, "第 " + turn.index + " 轮"))),
+                        h("div", { className: "dshbot-node", "data-kind": "turn" },
+                          h("span", { className: "dshbot-dot" }),
+                          h("div", { className: "dshbot-nodehead" }, h("b", null, "第 " + turn.index + " 轮"))),
                         items.map((message) => h("div", {
                           key: message.id,
-                          className: "dshdot-node",
+                          className: "dshbot-node",
                           "data-role": message.role,
                         },
-                          h("span", { className: "dshdot-dot" }),
-                          h("div", { className: "dshdot-nodehead" },
+                          h("span", { className: "dshbot-dot" }),
+                          h("div", { className: "dshbot-nodehead" },
                             h("b", null, message.role === "user" ? "提问" : "回复"),
                             message.meta === undefined
                               ? null
@@ -1083,27 +1084,27 @@ window.__ModuleLoader__.load({
                                     : " · 输入 " + message.meta.tokens.input + " / 输出 " + message.meta.tokens.output)
                                   + (message.meta.attachments === undefined ? "" : " · 附件 " + message.meta.attachments.join("、"))),
                             h("span", null, new Date(message.at).toLocaleTimeString())),
-                          h("div", { className: "dshdot-nodetext" },
+                          h("div", { className: "dshbot-nodetext" },
                             message.text.length > 300 ? message.text.slice(0, 300) + "…" : message.text))));
                     }))),
-        error === null ? null : h("div", { className: "dshdot-err" }, error),
-          h("div", { className: "dshdot-composer" },
-            h("div", { className: "dshdot-card" },
+        error === null ? null : h("div", { className: "dshbot-err" }, error),
+          h("div", { className: "dshbot-composer" },
+            h("div", { className: "dshbot-card" },
           files.length === 0
             ? null
-            : h("div", { className: "dshdot-chips" }, files.map((file, index) => h("span", {
+            : h("div", { className: "dshbot-chips" }, files.map((file, index) => h("span", {
                 key: file.name + index,
-                className: "dshdot-chip",
+                className: "dshbot-chip",
               },
                 file.name,
                 h("button", {
                   type: "button",
-                  className: "dshdot-chip-x",
+                  className: "dshbot-chip-x",
                   title: "移除",
                   onClick: () => setFiles((list) => list.filter((unused, position) => position !== index)),
                 }, "×")))),
           h("textarea", {
-            className: "dshdot-input",
+            className: "dshbot-input",
             rows: 1,
             value: draft,
             placeholder: current === null ? "说点什么…" : "跟" + current.name + "说点什么…",
@@ -1115,10 +1116,10 @@ window.__ModuleLoader__.load({
               }
             },
           }),
-              h("div", { className: "dshdot-row" },
+              h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-tool",
+              className: "dshbot-tool",
               title: "加附件（文本文件）",
               "aria-label": "加附件",
               onClick: () => {
@@ -1127,24 +1128,24 @@ window.__ModuleLoader__.load({
             }, "＋"),
             h("input", { type: "file", ref: fileRef, multiple: true, style: { display: "none" }, onChange: pickFiles }),
             h("select", {
-              className: "dshdot-select",
+              className: "dshbot-select",
               title: "权限：完全权限可以让它在后台干活，仅对话则不让",
               value: current === null ? "full" : current.permission,
-              onChange: (event) => quiet("/api/dot.manage", { action: "permission", id: dotId, permission: event.target.value }),
+              onChange: (event) => quiet("/api/bot.manage", { action: "permission", id: dotId, permission: event.target.value }),
             },
               h("option", { value: "full" }, "完全权限"),
               h("option", { value: "readonly" }, "只读"),
               h("option", { value: "chat" }, "仅对话")),
-            h("span", { className: "dshdot-spacer" }),
+            h("span", { className: "dshbot-spacer" }),
             h("button", {
               type: "button",
-              className: "dshdot-tool",
+              className: "dshbot-tool",
               disabled: sending || messages.length === 0,
               title: "回退最后一条",
-              onClick: () => quiet("/api/dot.rewind", { dotId, count: 1 }),
+              onClick: () => quiet("/api/bot.rewind", { dotId, count: 1 }),
             }, "回退"),
             h("select", {
-              className: "dshdot-select",
+              className: "dshbot-select",
               title: "模型",
               value: pinned,
               onChange: (event) => changeModel(event.target.value),
@@ -1156,7 +1157,7 @@ window.__ModuleLoader__.load({
               }, entry.name === undefined || entry.name === "" ? entry.id : entry.name))),
             h("button", {
               type: "button",
-              className: "dshdot-send",
+              className: "dshbot-send",
               disabled: sending || (draft.trim().length === 0 && files.length === 0),
               onClick: send,
             }, sending ? "…" : "发送")))));
@@ -1215,7 +1216,7 @@ window.__ModuleLoader__.load({
       const [memoryDir, setMemoryDir] = useState("");
       const [memoryFiles, setMemoryFiles] = useState([]);
       const loadMemoryTree = useCallback(() => {
-        call("/api/dot.manage", { action: "memoryTree" })
+        call("/api/bot.manage", { action: "memoryTree" })
           .then((value) => {
             if (Array.isArray(value.files)) setMemoryFiles(value.files);
             if (typeof value.dir === "string") setMemoryDir(value.dir);
@@ -1249,7 +1250,7 @@ window.__ModuleLoader__.load({
       const [choices, setChoices] = useState([]);
       useEffect(() => {
         let alive = true;
-        call("/api/dot.models")
+        call("/api/bot.models")
           .then((value) => {
             if (alive) setChoices(Array.isArray(value.models) ? value.models : []);
           })
@@ -1273,7 +1274,7 @@ window.__ModuleLoader__.load({
       // probes, the panel only shows the answer.
       useEffect(() => {
         let alive = true;
-        fetch("/api/dot.env", { cache: "no-store", headers: { accept: "application/json" } })
+        fetch("/api/bot.env", { cache: "no-store", headers: { accept: "application/json" } })
           .then((response) => response.json())
           .then((value) => {
             if (alive) setEnvironments(Array.isArray(value.environments) ? value.environments : []);
@@ -1316,7 +1317,7 @@ window.__ModuleLoader__.load({
         setBusy(true);
         setError(null);
         try {
-          const result = await call("/api/dot.manage", body);
+          const result = await call("/api/bot.manage", body);
           if (result.error !== undefined) setError(result.error);
           else await onChanged();
         } catch (failure) {
@@ -1392,7 +1393,7 @@ window.__ModuleLoader__.load({
         setBusy(true);
         setError(null);
         try {
-          const result = await call("/api/dot.worker", { action: "poke" });
+          const result = await call("/api/bot.worker", { action: "poke" });
           if (result.error !== undefined) setError(result.error);
           else await onChanged();
         } catch (failure) {
@@ -1405,43 +1406,43 @@ window.__ModuleLoader__.load({
       if (current === undefined) return null;
       const trimmed = name.trim();
       const worker = snapshot.worker ?? { state: "—", reason: "", runsToday: 0 };
-      return h("div", { className: "dshdot" },
+      return h("div", { className: "dshbot" },
         h("style", null, CSS),
         // A plain view, not a floating layer: an absolutely positioned sheet
         // resolves against whatever ancestor happens to be positioned, which
         // put this one's close button on top of the shell's own header.
-        h("div", { className: "dshdot-overlay" },
-        h("div", { className: "dshdot-overlay-head" },
-          h("button", { type: "button", className: "dshdot-icon", onClick: onClose, title: "返回", "aria-label": "返回" },
+        h("div", { className: "dshbot-overlay" },
+        h("div", { className: "dshbot-overlay-head" },
+          h("button", { type: "button", className: "dshbot-icon", onClick: onClose, title: "返回", "aria-label": "返回" },
             h(BackIcon, null)),
-          h("h2", { className: "dshdot-h1" }, "设置 · " + current.name)),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "运行状态"),
-          h("div", { className: "dshdot-row" },
+          h("h2", { className: "dshbot-h1" }, "设置 · " + current.name)),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "运行状态"),
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               "data-on": String(current.paused !== true),
               disabled: busy,
               onClick: () => run({ action: "pause", id: current.id, paused: current.paused !== true }),
             }, current.paused === true ? "已暂停 · 点击恢复" : "运行中 · 点击暂停"),
-            h("span", { className: "dshdot-note" }, "暂停后它不再自己动队列，说话照常。")),
-          h("div", { className: "dshdot-row" },
+            h("span", { className: "dshbot-note" }, "暂停后它不再自己动队列，说话照常。")),
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               "data-danger": "true",
               disabled: busy,
               onClick: () => run({ action: "reset", id: current.id }),
             }, "重置这个 bot"),
-            h("span", { className: "dshdot-note" }, "清掉它的对话、模型选择和暂停状态；名字、类型和身份保留。"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "工作区"),
-          h("div", { className: "dshdot-note" },
+            h("span", { className: "dshbot-note" }, "清掉它的对话、模型选择和暂停状态；名字、类型和身份保留。"))),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "工作区"),
+          h("div", { className: "dshbot-note" },
             "它干活的地方，文件都在这里。留空用宿主当前目录；填了会帮你建出来。"),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               value: workDraft,
               placeholder: "比如 D:\\bots\\yu",
               onChange: (event) => setWorkDraft(event.target.value),
@@ -1453,22 +1454,22 @@ window.__ModuleLoader__.load({
             }),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || workDraft === (current.workspace ?? ""),
               onClick: () => run({ action: "workspace", id: current.id, workspace: workDraft.trim() }),
             }, "应用"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "执行环境"),
-          h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "执行环境"),
+          h("div", { className: "dshbot-note" },
             "它的命令在哪里跑。本机就是直接用这台电脑；选 WSL 等于给它一台自己的 Linux 机器。"),
           environments.length <= 1
-            ? h("div", { className: "dshdot-note" },
+            ? h("div", { className: "dshbot-note" },
                 "这台机器目前只有本机可用。要给它一台自己的机器，用管理员权限开一个终端跑 ",
-                h("code", { className: "dshdot-code" }, "wsl --install"),
+                h("code", { className: "dshbot-code" }, "wsl --install"),
                 " ，装完重启，回到这里就能选。")
-            : h("div", { className: "dshdot-row" },
+            : h("div", { className: "dshbot-row" },
                 h("select", {
-                  className: "dshdot-select",
+                  className: "dshbot-select",
                   value: (current.environment === undefined ? "host" : current.environment.kind)
                     + "|" + (current.environment === undefined ? "" : current.environment.target),
                   onChange: (event) => {
@@ -1485,13 +1486,13 @@ window.__ModuleLoader__.load({
                     key: entry.kind + "|" + entry.target,
                     value: entry.kind + "|" + entry.target,
                   }, entry.label))))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "规则"),
-          h("div", { className: "dshdot-note" }, "它自己能动到什么程度。被挡住的活不会丢，会留在队列里等。"),
-          h("div", { className: "dshdot-row" },
-            h("span", { className: "dshdot-numwrap" }, "后台干活"),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "规则"),
+          h("div", { className: "dshbot-note" }, "它自己能动到什么程度。被挡住的活不会丢，会留在队列里等。"),
+          h("div", { className: "dshbot-row" },
+            h("span", { className: "dshbot-numwrap" }, "后台干活"),
             h("select", {
-              className: "dshdot-select",
+              className: "dshbot-select",
               value: rules.background,
               onChange: (event) => saveSettings({ rules: { ...rules, background: event.target.value } }),
             },
@@ -1499,10 +1500,10 @@ window.__ModuleLoader__.load({
               h("option", { value: "preapproved" }, "我派的才做"),
               h("option", { value: "ask" }, "做前问我"),
               h("option", { value: "handoff" }, "只提示我"))),
-          h("div", { className: "dshdot-row" },
-            h("span", { className: "dshdot-numwrap" }, "对外发送"),
+          h("div", { className: "dshbot-row" },
+            h("span", { className: "dshbot-numwrap" }, "对外发送"),
             h("select", {
-              className: "dshdot-select",
+              className: "dshbot-select",
               value: rules.outgoing,
               onChange: (event) => saveSettings({ rules: { ...rules, outgoing: event.target.value } }),
             },
@@ -1510,11 +1511,11 @@ window.__ModuleLoader__.load({
               h("option", { value: "preapproved" }, "我派的才发"),
               h("option", { value: "ask" }, "发前问我"),
               h("option", { value: "handoff" }, "只提示我")))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "名字"),
-          h("div", { className: "dshdot-row" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "名字"),
+          h("div", { className: "dshbot-row" },
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               value: name,
               onChange: (event) => setName(event.target.value),
               onKeyDown: (event) => {
@@ -1526,36 +1527,36 @@ window.__ModuleLoader__.load({
             }),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || trimmed.length === 0 || trimmed === current.name,
               onClick: () => run({ action: "rename", id: current.id, name: trimmed }),
             }, "保存"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "类型"),
-          h("div", { className: "dshdot-grid" }, types.map((type) => h("button", {
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "类型"),
+          h("div", { className: "dshbot-grid" }, types.map((type) => h("button", {
             key: type.id,
             type: "button",
-            className: "dshdot-option",
+            className: "dshbot-option",
             "data-picked": String(type.id === current.type),
             disabled: busy,
             onClick: () => run({ action: "type", id: current.id, type: type.id }),
           },
             h("b", null, type.name),
             h("span", null, type.blurb))))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "后台执行"),
-          h("div", { className: "dshdot-row" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "后台执行"),
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
               onClick: () => saveSettings({ workerEnabled: settings.workerEnabled !== true }),
             }, settings.workerEnabled === true ? "已开启 · 点击关闭" : "已关闭 · 点击开启"),
-            h("span", { className: "dshdot-note" }, "打开后它会自己按队列干活，每次执行都会花掉模型额度。")),
-          h("div", { className: "dshdot-row" },
-            h("label", { className: "dshdot-numwrap" }, "每",
+            h("span", { className: "dshbot-note" }, "打开后它会自己按队列干活，每次执行都会花掉模型额度。")),
+          h("div", { className: "dshbot-row" },
+            h("label", { className: "dshbot-numwrap" }, "每",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "5",
                 value: pollDraft,
@@ -1563,9 +1564,9 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setPollDraft(event.target.value),
                 onBlur: () => saveSettings({ workerPollSeconds: Number(pollDraft) }),
               }), "秒看一次队列"),
-            h("label", { className: "dshdot-numwrap" }, "同时做",
+            h("label", { className: "dshbot-numwrap" }, "同时做",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "1",
                 max: "32",
@@ -1574,24 +1575,24 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setConcDraft(event.target.value),
                 onBlur: () => saveSettings({ workerConcurrency: Number(concDraft) }),
               }), "件")),
-          h("div", { className: "dshdot-note" },
+          h("div", { className: "dshbot-note" },
             "执行器：" + worker.state + (worker.reason === "" ? "" : "（" + worker.reason + "）")
             + "　今天跑了 " + String(worker.runsToday ?? 0) + " 次，没有上限——开和关就是唯一的总闸。")),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "晨间简报"),
-          h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "晨间简报"),
+          h("div", { className: "dshbot-note" },
             "每天到点，把夜里发生的事汇总一条发给你：从连接进来的消息，加上排队的活做完了什么。"
             + "没东西可说的时候它不会打扰你。"),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
               onClick: () => saveBriefing({ enabled: briefing.enabled !== true }),
             }, briefing.enabled === true ? "已开启 · 点击关闭" : "已关闭 · 点击开启"),
-            h("label", { className: "dshdot-numwrap" }, "时间",
+            h("label", { className: "dshbot-numwrap" }, "时间",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 style: { width: "78px" },
                 value: briefAtDraft,
                 placeholder: "08:00",
@@ -1599,21 +1600,21 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setBriefAtDraft(event.target.value),
                 onBlur: () => saveBriefing({ at: briefAtDraft.trim() }),
               })),
-            h("label", { className: "dshdot-numwrap" }, "走",
+            h("label", { className: "dshbot-numwrap" }, "走",
               h("select", {
-                className: "dshdot-select",
+                className: "dshbot-select",
                 disabled: busy,
                 value: briefing.connectorId ?? "",
                 onChange: (event) => saveBriefing({ connectorId: event.target.value }),
               },
                 h("option", { value: "" }, "任意可用的连接"),
                 connectors.map((entry) => h("option", { key: entry.id, value: entry.id }, entry.name))))),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
-              onClick: () => call("/api/dot.manage", { action: "briefingNow", dotId: current.id })
+              onClick: () => call("/api/bot.manage", { action: "briefingNow", dotId: current.id })
                 .then((value) => {
                   if (value.error !== undefined) setError(value.error);
                   else if (value.skipped === "quiet") setError("没有值得说的事，它选择了沉默");
@@ -1622,39 +1623,39 @@ window.__ModuleLoader__.load({
                 })
                 .catch(() => {}),
             }, "现在发一条"),
-            h("span", { className: "dshdot-note" },
+            h("span", { className: "dshbot-note" },
               briefing.lastAt === "" || briefing.lastAt === undefined
                 ? "还没发过"
                 : "上次发出：" + shortAgo(briefing.lastAt)))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "日程"),
-          h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "日程"),
+          h("div", { className: "dshbot-note" },
             "交给它记的日程和提醒。到点它会通过上面那条连接说出来——不受晨间简报开关影响。"),
           agenda.length === 0
-            ? h("div", { className: "dshdot-note" }, "还没有安排。跟它说「周五晚上八点提醒我」就会出现在这里。")
-            : h("ul", { className: "dshdot-list" }, agenda.map((entry) => h("li", {
+            ? h("div", { className: "dshbot-note" }, "还没有安排。跟它说「周五晚上八点提醒我」就会出现在这里。")
+            : h("ul", { className: "dshbot-list" }, agenda.map((entry) => h("li", {
                 key: entry.id,
-                className: "dshdot-item",
+                className: "dshbot-item",
               },
-                h("span", { className: "dshdot-tag" }, entry.done ? "已完成" : shortAgo(entry.at)),
+                h("span", { className: "dshbot-tag" }, entry.done ? "已完成" : shortAgo(entry.at)),
                 h("span", { style: { flex: 1, minWidth: 0 } }, entry.text),
                 h("button", {
                   type: "button",
-                  className: "dshdot-btn",
+                  className: "dshbot-btn",
                   disabled: busy,
                   title: "删掉这一条",
-                  onClick: () => call("/api/dot.manage", { action: "agendaRemove", id: entry.id })
+                  onClick: () => call("/api/bot.manage", { action: "agendaRemove", id: entry.id })
                     .then(() => onChanged())
                     .catch(() => {}),
                 }, "删除"))))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "限额"),
-          h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "限额"),
+          h("div", { className: "dshbot-note" },
             "这些数字都是你的，不是我们定的。填 0 就是不限——除了并发数和轮询间隔需要有个范围，其余都不拦你。"),
-          h("div", { className: "dshdot-row" },
-            h("label", { className: "dshdot-numwrap" }, "单个任务最多跑",
+          h("div", { className: "dshbot-row" },
+            h("label", { className: "dshbot-numwrap" }, "单个任务最多跑",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "0",
                 value: limitValue("taskMinutes", 30),
@@ -1662,9 +1663,9 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, taskMinutes: event.target.value }),
                 onBlur: () => saveLimit("taskMinutes"),
               }), "分钟"),
-            h("label", { className: "dshdot-numwrap" }, "每天累计最多",
+            h("label", { className: "dshbot-numwrap" }, "每天累计最多",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "0",
                 value: limitValue("dailyMinutes", 0),
@@ -1672,9 +1673,9 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, dailyMinutes: event.target.value }),
                 onBlur: () => saveLimit("dailyMinutes"),
               }), "分钟"),
-            h("label", { className: "dshdot-numwrap" }, "每个任务最多调",
+            h("label", { className: "dshbot-numwrap" }, "每个任务最多调",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "0",
                 value: limitValue("toolRounds", 8),
@@ -1682,10 +1683,10 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, toolRounds: event.target.value }),
                 onBlur: () => saveLimit("toolRounds"),
               }), "次工具")),
-          h("div", { className: "dshdot-row" },
-            h("label", { className: "dshdot-numwrap" }, "队列保留",
+          h("div", { className: "dshbot-row" },
+            h("label", { className: "dshbot-numwrap" }, "队列保留",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "10",
                 value: limitValue("taskLimit", 300),
@@ -1693,9 +1694,9 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, taskLimit: event.target.value }),
                 onBlur: () => saveLimit("taskLimit"),
               }), "条"),
-            h("label", { className: "dshdot-numwrap" }, "回放",
+            h("label", { className: "dshbot-numwrap" }, "回放",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "0",
                 value: limitValue("recallMessages", 12),
@@ -1703,9 +1704,9 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, recallMessages: event.target.value }),
                 onBlur: () => saveLimit("recallMessages"),
               }), "条对话当上下文"),
-            h("label", { className: "dshdot-numwrap" }, "面板加载",
+            h("label", { className: "dshbot-numwrap" }, "面板加载",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "10",
                 value: limitValue("transcriptWindow", 60),
@@ -1713,15 +1714,15 @@ window.__ModuleLoader__.load({
                 onChange: (event) => setLimitDrafts({ ...limitDrafts, transcriptWindow: event.target.value }),
                 onBlur: () => saveLimit("transcriptWindow"),
               }), "条"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "自主时间"),
-          h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "自主时间"),
+          h("div", { className: "dshbot-note" },
             "没人跟你说话的时候，它自己找点事做：查感兴趣的东西、收拾工作区、把没想完的事想完。"
             + "产物写到它自己的工作区，不塞进对话——所以聊天记录永远是聊天记录。"),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
               onClick: () => saveSettings({
                 autonomy: { ...autonomy.config, enabled: autonomy.config.enabled !== true },
@@ -1729,20 +1730,20 @@ window.__ModuleLoader__.load({
             }, autonomy.config.enabled === true ? "已开启 · 点击关闭" : "已关闭 · 点击开启"),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || settings.workerEnabled !== true,
               title: settings.workerEnabled === true ? "不用等空闲，现在就给它派一件" : "先打开后台执行",
-              onClick: () => call("/api/dot.worker", { action: "trigger", dotId: current.id })
+              onClick: () => call("/api/bot.worker", { action: "trigger", dotId: current.id })
                 .then(() => onChanged())
                 .catch(() => {}),
             }, "现在就去看一眼"),
-            h("span", { className: "dshdot-note" },
+            h("span", { className: "dshbot-note" },
               "状态：" + autonomy.state + (autonomy.reason === "" ? "" : "（" + autonomy.reason + "）")
               + "　今天 " + String(autonomy.today ?? 0) + " 次")),
-          h("div", { className: "dshdot-row" },
-            h("label", { className: "dshdot-numwrap" }, "空闲",
+          h("div", { className: "dshbot-row" },
+            h("label", { className: "dshbot-numwrap" }, "空闲",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "1",
                 value: idleDraft,
@@ -1752,9 +1753,9 @@ window.__ModuleLoader__.load({
                   autonomy: { ...autonomy.config, idleMinutes: Number(idleDraft) },
                 }),
               }), "分钟后"),
-            h("label", { className: "dshdot-numwrap" }, "每隔",
+            h("label", { className: "dshbot-numwrap" }, "每隔",
               h("input", {
-                className: "dshdot-num",
+                className: "dshbot-num",
                 type: "number",
                 min: "0",
                 value: coolDraft,
@@ -1764,13 +1765,13 @@ window.__ModuleLoader__.load({
                   autonomy: { ...autonomy.config, cooldownMinutes: Number(coolDraft) },
                 }),
               }), "分钟最多一次（0＝不设间隔）")),
-          h("div", { className: "dshdot-row" },
-            h("span", { className: "dshdot-note" }, "没人看着的时候它能做什么：")),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
+            h("span", { className: "dshbot-note" }, "没人看着的时候它能做什么：")),
+          h("div", { className: "dshbot-row" },
             ...AUTONOMY_MODES.map((entry) => h("button", {
               key: entry.id,
               type: "button",
-              className: "dshdot-tool",
+              className: "dshbot-tool",
               "data-on": String((autonomy.config.permission ?? "read") === entry.id),
               disabled: busy,
               title: entry.blurb,
@@ -1778,12 +1779,12 @@ window.__ModuleLoader__.load({
                 autonomy: { ...autonomy.config, permission: entry.id },
               }),
             }, entry.label)),
-            h("span", { className: "dshdot-note" },
+            h("span", { className: "dshbot-note" },
               AUTONOMY_MODES.find((entry) => entry.id === (autonomy.config.permission ?? "read"))?.blurb ?? "")),
-          h("div", { className: "dshdot-row" },
-            h("label", { className: "dshdot-numwrap" }, "空闲时用",
+          h("div", { className: "dshbot-row" },
+            h("label", { className: "dshbot-numwrap" }, "空闲时用",
               h("select", {
-                className: "dshdot-select",
+                className: "dshbot-select",
                 disabled: busy,
                 value: autonomyKey,
                 onChange: (event) => {
@@ -1805,9 +1806,9 @@ window.__ModuleLoader__.load({
                 }, entry.name === undefined ? entry.id : entry.name)))),
             autonomyModel === undefined || !Array.isArray(autonomyModel.efforts) || autonomyModel.efforts.length === 0
               ? null
-              : h("label", { className: "dshdot-numwrap" }, "思考",
+              : h("label", { className: "dshbot-numwrap" }, "思考",
                   h("select", {
-                    className: "dshdot-select",
+                    className: "dshbot-select",
                     disabled: busy,
                     value: autonomyChoice === null || autonomyChoice.reasoningEffort === undefined
                       ? ""
@@ -1827,10 +1828,10 @@ window.__ModuleLoader__.load({
                       key: effort.id,
                       value: effort.id,
                     }, effort.name === undefined ? effort.id : effort.name)))))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "头像"),
-          h("div", { className: "dshdot-row" },
-                h("label", { className: "dshdot-btn", title: "选一张图片存到本地，然后它是这个 bot 的形象" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "头像"),
+          h("div", { className: "dshbot-row" },
+                h("label", { className: "dshbot-btn", title: "选一张图片存到本地，然后它是这个 bot 的形象" },
                   "上传图片",
                   h("input", {
                     type: "file",
@@ -1841,7 +1842,7 @@ window.__ModuleLoader__.load({
                       if (file === undefined) return;
                       const reader = new FileReader();
                       reader.onload = () => {
-                        call("/api/dot.manage", {
+                        call("/api/bot.manage", {
                           action: "avatarUpload",
                           dotId: current.id,
                           dataUrl: String(reader.result),
@@ -1860,7 +1861,7 @@ window.__ModuleLoader__.load({
                     },
                   })),
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               value: avatarDraft,
                   placeholder: "留空用内置形象；也可以填一个本地图片路径",
               onChange: (event) => setAvatarDraft(event.target.value),
@@ -1874,34 +1875,34 @@ window.__ModuleLoader__.load({
             }),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || avatarDraft === (settings.avatarPath ?? ""),
               onClick: () => {
                 loadAvatar(true);
                 saveSettings({ avatarPath: avatarDraft.trim() });
               },
             }, "应用"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "共享状态"),
-          h("div", { className: "dshdot-row" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "共享状态"),
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               "data-danger": "true",
               disabled: busy,
               onClick: () => run({ action: "clearShared" }),
             }, "清空共享记忆与任务队列")),
-          h("div", { className: "dshdot-note" }, "只清这两份共享数据，各个 bot 自己的对话不动。")),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "MCP 服务"),
-          h("div", { className: "dshdot-note" },
+          h("div", { className: "dshbot-note" }, "只清这两份共享数据，各个 bot 自己的对话不动。")),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "MCP 服务"),
+          h("div", { className: "dshbot-note" },
             "插件不带任何 MCP 服务，也不带凭据——你填一个地址，它就把那边的工具接过来。"
             + "工具名是 `mcp__服务名__工具名`，和别的客户端一致，复制过来就能用。"),
           mcpServers.length === 0
-            ? h("div", { className: "dshdot-note" }, "还没有配置。填一个 streamable HTTP 地址就能用。")
-            : h("ul", { className: "dshdot-list" }, mcpServers.map((entry) => h("li", {
+            ? h("div", { className: "dshbot-note" }, "还没有配置。填一个 streamable HTTP 地址就能用。")
+            : h("ul", { className: "dshbot-list" }, mcpServers.map((entry) => h("li", {
                 key: entry.id,
-                className: "dshdot-item",
+                className: "dshbot-item",
               },
                 h(ServiceDot, { state: serviceState(entry) }),
                 h("span", { style: { flex: 1, minWidth: 0, overflowWrap: "anywhere" } },
@@ -1910,10 +1911,10 @@ window.__ModuleLoader__.load({
                   + (entry.lastError === "" ? "" : `　✗ ${entry.lastError}`)),
                 h("button", {
                   type: "button",
-                  className: "dshdot-tool",
+                  className: "dshbot-tool",
                   disabled: busy,
                   title: "连一次看看通不通，并把工具列表取回来",
-                  onClick: () => call("/api/dot.manage", { action: "mcpProbe", serverId: entry.id })
+                  onClick: () => call("/api/bot.manage", { action: "mcpProbe", serverId: entry.id })
                     .then((value) => {
                       setError(value.error === undefined
                         ? `${entry.name} 通了，${value.tools.length} 个工具`
@@ -1924,21 +1925,21 @@ window.__ModuleLoader__.load({
                 }, "检测"),
                 h("button", {
                   type: "button",
-                  className: "dshdot-tool",
+                  className: "dshbot-tool",
                   disabled: busy,
-                  onClick: () => call("/api/dot.manage", { action: "mcpRemove", serverId: entry.id })
+                  onClick: () => call("/api/bot.manage", { action: "mcpRemove", serverId: entry.id })
                     .then(() => onChanged())
                     .catch(() => {}),
                 }, "删除")))),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               value: mcpUrl,
               placeholder: "https://example.com/mcp",
               onChange: (event) => setMcpUrl(event.target.value),
             }),
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               style: { maxWidth: "120px" },
               value: mcpName,
               placeholder: "名字",
@@ -1946,9 +1947,9 @@ window.__ModuleLoader__.load({
             }),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || mcpUrl.trim() === "",
-              onClick: () => call("/api/dot.manage", {
+              onClick: () => call("/api/bot.manage", {
                 action: "mcpAdd",
                 server: { name: mcpName.trim() === "" ? "MCP" : mcpName.trim(), url: mcpUrl.trim() },
               })
@@ -1961,28 +1962,28 @@ window.__ModuleLoader__.load({
                 })
                 .catch(() => {}),
             }, "＋ 添加"))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "连接"),
-          h("div", { className: "dshdot-note" }, "插件不内置任何平台。填你自己的地址或 token，再决定哪个 bot 能用它。"),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "连接"),
+          h("div", { className: "dshbot-note" }, "插件不内置任何平台。填你自己的地址或 token，再决定哪个 bot 能用它。"),
           connectors.length === 0
-            ? h("div", { className: "dshdot-note" }, "还没有配置任何连接。")
-            : h("div", { className: "dshdot-rows" }, connectors.map((entry) => h("div", {
+            ? h("div", { className: "dshbot-note" }, "还没有配置任何连接。")
+            : h("div", { className: "dshbot-rows" }, connectors.map((entry) => h("div", {
                 key: entry.id,
-                className: "dshdot-rowitem",
+                className: "dshbot-rowitem",
               },
-                h("div", { className: "dshdot-rowtop" },
-                  h("span", { className: "dshdot-rowmark", "data-unread": String(entry.enabled) }),
+                h("div", { className: "dshbot-rowtop" },
+                  h("span", { className: "dshbot-rowmark", "data-unread": String(entry.enabled) }),
                     h(ServiceDot, { state: serviceState(entry) }),
-                    h("span", { className: "dshdot-rowname" }, entry.name),
-                  h("span", { className: "dshdot-rowmeta" }, entry.kind === "telegram" ? "Telegram" : "HTTP"),
-                  h("span", { className: "dshdot-rowtime" }, entry.allowedDots.length === 0 ? "全部 bot" : entry.allowedDots.length + " 个")),
-                  h("div", { className: "dshdot-rowactions" },
+                    h("span", { className: "dshbot-rowname" }, entry.name),
+                  h("span", { className: "dshbot-rowmeta" }, entry.kind === "telegram" ? "Telegram" : "HTTP"),
+                  h("span", { className: "dshbot-rowtime" }, entry.allowedDots.length === 0 ? "全部 bot" : entry.allowedDots.length + " 个")),
+                  h("div", { className: "dshbot-rowactions" },
                     h("button", { type: "button", disabled: busy, onClick: () => openConnector(entry) }, "编辑"),
                     h("button", {
                       type: "button",
                       disabled: busy || !entry.inbound,
                       title: entry.inbound ? "现在收一次，看能不能通" : "这条连接只出不进，没法检测",
-                      onClick: () => call("/api/dot.manage", { action: "connectorPull", connectorId: entry.id })
+                      onClick: () => call("/api/bot.manage", { action: "connectorPull", connectorId: entry.id })
                         .then((value) => {
                           setError(value.error === undefined ? `${entry.name} 通了` : `${entry.name}：${value.error}`);
                           return onChanged();
@@ -2001,23 +2002,23 @@ window.__ModuleLoader__.load({
                       onClick: () => run({ action: "connectorRemove", connectorId: entry.id }),
                     }, "删除"))))),
           connForm === null
-            ? h("div", { className: "dshdot-row" },
+            ? h("div", { className: "dshbot-row" },
                 h("button", {
                   type: "button",
-                  className: "dshdot-btn",
+                  className: "dshbot-btn",
                   disabled: busy,
                   onClick: () => openConnector(undefined),
                 }, "＋ 添加连接"))
-            : h("div", { className: "dshdot-connform" },
+            : h("div", { className: "dshbot-connform" },
                 h("input", {
-                  className: "dshdot-text",
+                  className: "dshbot-text",
                   value: connForm.name,
                   autoFocus: true,
                   placeholder: "名字，比如「家里的群」",
                   onChange: (event) => setConnForm({ ...connForm, name: event.target.value }),
                 }),
                 h("select", {
-                  className: "dshdot-select",
+                  className: "dshbot-select",
                   value: connForm.kind,
                   onChange: (event) => setConnForm({ ...connForm, kind: event.target.value }),
                 },
@@ -2025,7 +2026,7 @@ window.__ModuleLoader__.load({
                   h("option", { value: "http" }, "HTTP 接口")),
                 connForm.kind === "telegram"
                   ? h("input", {
-                      className: "dshdot-text",
+                      className: "dshbot-text",
                       value: connForm.token,
                       placeholder: "Bot Token（从 @BotFather 拿）",
                       onChange: (event) => setConnForm({ ...connForm, token: event.target.value }),
@@ -2033,7 +2034,7 @@ window.__ModuleLoader__.load({
                   : null,
                 connForm.kind === "telegram"
                   ? h("input", {
-                      className: "dshdot-text",
+                      className: "dshbot-text",
                       value: connForm.chatId,
                       placeholder: "Chat ID（发给谁）",
                       onChange: (event) => setConnForm({ ...connForm, chatId: event.target.value }),
@@ -2041,7 +2042,7 @@ window.__ModuleLoader__.load({
                   : null,
                 connForm.kind === "http"
                   ? h("input", {
-                      className: "dshdot-text",
+                      className: "dshbot-text",
                       value: connForm.url,
                       placeholder: "https://…（可以放一个 {message} 占位）",
                       onChange: (event) => setConnForm({ ...connForm, url: event.target.value }),
@@ -2049,7 +2050,7 @@ window.__ModuleLoader__.load({
                   : null,
                 connForm.kind === "http"
                   ? h("select", {
-                      className: "dshdot-select",
+                      className: "dshbot-select",
                       value: connForm.method,
                       onChange: (event) => setConnForm({ ...connForm, method: event.target.value }),
                     },
@@ -2059,18 +2060,18 @@ window.__ModuleLoader__.load({
                   : null,
                 connForm.kind === "http"
                   ? h("textarea", {
-                      className: "dshdot-input",
+                      className: "dshbot-input",
                       rows: 2,
                       value: connForm.headers,
                       placeholder: "额外请求头，一行一个：Authorization: Bearer …",
                       onChange: (event) => setConnForm({ ...connForm, headers: event.target.value }),
                     })
                   : null,
-                h("div", { className: "dshdot-note" }, "允许哪些 bot 使用（一个都不勾＝全部）："),
-                h("div", { className: "dshdot-chips" }, snapshot.dots.map((dot) => h("button", {
+                h("div", { className: "dshbot-note" }, "允许哪些 bot 使用（一个都不勾＝全部）："),
+                h("div", { className: "dshbot-chips" }, snapshot.dots.map((dot) => h("button", {
                   key: dot.id,
                   type: "button",
-                  className: "dshdot-tool",
+                  className: "dshbot-tool",
                   "data-on": String(connForm.allowedDots.includes(dot.id)),
                   onClick: () => setConnForm({
                     ...connForm,
@@ -2079,18 +2080,18 @@ window.__ModuleLoader__.load({
                       : [...connForm.allowedDots, dot.id],
                   }),
                 }, dot.name))),
-                h("div", { className: "dshdot-row" },
+                h("div", { className: "dshbot-row" },
                   h("button", {
                     type: "button",
-                    className: "dshdot-btn",
+                    className: "dshbot-btn",
                     "data-on": String(connForm.inbound),
                     disabled: busy,
                     onClick: () => setConnForm({ ...connForm, inbound: !connForm.inbound }),
                   }, connForm.inbound ? "也接收消息 · 点击关闭" : "只发不收 · 点击改为接收"),
                   connForm.inbound
-                    ? h("label", { className: "dshdot-numwrap" }, "收进",
+                    ? h("label", { className: "dshbot-numwrap" }, "收进",
                         h("select", {
-                          className: "dshdot-select",
+                          className: "dshbot-select",
                           disabled: busy,
                           value: connForm.bindDotId,
                           onChange: (event) => setConnForm({ ...connForm, bindDotId: event.target.value }),
@@ -2099,54 +2100,54 @@ window.__ModuleLoader__.load({
                           snapshot.dots.map((dot) => h("option", { key: dot.id, value: dot.id }, dot.name))))
                     : null),
                 connForm.inbound
-                  ? h("div", { className: "dshdot-note" },
+                  ? h("div", { className: "dshbot-note" },
                       "打开后，从这条连接进来的消息会直接写进那个 bot 的对话——跟你在网页上打字是同一份记录，"
                       + "所以两边看到的一模一样，不需要同步。"
                       + (connForm.kind === "telegram" ? " Telegram 用长轮询收取，不需要公网地址或 webhook。" : ""))
                   : null,
-                h("div", { className: "dshdot-row" },
+                h("div", { className: "dshbot-row" },
                   h("button", {
                     type: "button",
-                    className: "dshdot-btn",
+                    className: "dshbot-btn",
                     disabled: busy || connForm.name.trim().length === 0,
                     onClick: saveConnector,
                   }, connForm.id === undefined ? "保存连接" : "保存修改"),
                   h("button", {
                     type: "button",
-                    className: "dshdot-btn",
+                    className: "dshbot-btn",
                     onClick: () => setConnForm(null),
                   }, "取消")))),
-        error === null ? null : h("div", { className: "dshdot-err", style: { margin: 0 } }, error),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "这段对话"),
-          h("div", { className: "dshdot-row" },
+        error === null ? null : h("div", { className: "dshbot-err", style: { margin: 0 } }, error),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "这段对话"),
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || current.messages === 0,
               onClick: () => run({ action: "clear", id: current.id }),
             }, "清空记录"),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               "data-danger": "true",
               disabled: busy || snapshot.dots.length <= 1,
               title: snapshot.dots.length <= 1 ? "至少要留一个 bot" : "删除这个 bot",
               onClick: () => run({ action: "delete", id: current.id }),
             }, "删除这个 bot")),
-          snapshot.dots.length <= 1 ? h("div", { className: "dshdot-note" }, "至少要留一个 bot。") : null),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "共享记忆"),
-          h("div", { className: "dshdot-note" },
+          snapshot.dots.length <= 1 ? h("div", { className: "dshbot-note" }, "至少要留一个 bot。") : null),
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "共享记忆"),
+          h("div", { className: "dshbot-note" },
             "记忆现在是硬盘上的 Markdown 文件，你可以直接打开、改、删。"
             + "根目录那几个文件每轮都读；子目录里只有文件名和描述进上下文，正文按需打开。"
             + "每一层目录要有自己的 `MEMORY.md` 才算记忆目录。"),
-          h("div", { className: "dshdot-row" },
+          h("div", { className: "dshbot-row" },
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
-              onClick: () => call("/api/dot.manage", { action: "memoryOpen" })
+              onClick: () => call("/api/bot.manage", { action: "memoryOpen" })
                 .then((value) => {
                   setMemoryDir(value.dir ?? "");
                   if (value.dir !== undefined) setError("记忆在 " + value.dir);
@@ -2155,10 +2156,10 @@ window.__ModuleLoader__.load({
             }, "打开记忆文件夹"),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy,
               title: "按文件里的内容重建可检索的索引——你手改过的会保留，删掉的会消失",
-              onClick: () => call("/api/dot.manage", { action: "memoryImport" })
+              onClick: () => call("/api/bot.manage", { action: "memoryImport" })
                 .then((value) => {
                   if (value.error !== undefined) setError(value.error);
                   else setError("从 " + value.files + " 个文件重建了 " + value.entries + " 条索引");
@@ -2166,26 +2167,26 @@ window.__ModuleLoader__.load({
                 })
                 .catch(() => {}),
             }, "从文件重新导入"),
-            h("span", { className: "dshdot-note" }, memoryDir)),
+            h("span", { className: "dshbot-note" }, memoryDir)),
           memoryFiles.length === 0
-            ? h("div", { className: "dshdot-note" }, "还没有记忆文件。上面点一次就会创建。")
-            : h("ul", { className: "dshdot-list" }, memoryFiles.map((file) => h("li", {
+            ? h("div", { className: "dshbot-note" }, "还没有记忆文件。上面点一次就会创建。")
+            : h("ul", { className: "dshbot-list" }, memoryFiles.map((file) => h("li", {
                 key: file.path,
-                className: "dshdot-item",
+                className: "dshbot-item",
               },
-                h("span", { className: "dshdot-tag" }, file.tier === "root" ? "常驻" : file.tier),
+                h("span", { className: "dshbot-tag" }, file.tier === "root" ? "常驻" : file.tier),
                 h("span", { style: { flex: 1, minWidth: 0, overflowWrap: "anywhere" } },
                   file.path + (file.description === "" ? "" : " — " + file.description)))))),
           snapshot.memory.length === 0
-            ? h("div", { className: "dshdot-note" }, "还没有记录。")
-            : h("ul", { className: "dshdot-list" }, snapshot.memory.map((entry) => h("li", { key: entry.id, className: "dshdot-item" },
-                h("span", { className: "dshdot-tag" }, entry.kind === "decision" ? "决策" : entry.kind === "fact" ? "事实" : "笔记"),
+            ? h("div", { className: "dshbot-note" }, "还没有记录。")
+            : h("ul", { className: "dshbot-list" }, snapshot.memory.map((entry) => h("li", { key: entry.id, className: "dshbot-item" },
+                h("span", { className: "dshbot-tag" }, entry.kind === "decision" ? "决策" : entry.kind === "fact" ? "事实" : "笔记"),
                 h("span", { style: { overflowWrap: "anywhere" } }, entry.text)))),
-        h("div", { className: "dshdot-field" },
-          h("span", { className: "dshdot-label" }, "任务队列"),
-          h("div", { className: "dshdot-row" },
+        h("div", { className: "dshbot-field" },
+          h("span", { className: "dshbot-label" }, "任务队列"),
+          h("div", { className: "dshbot-row" },
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               value: newTask,
               placeholder: "交办一件事，它会在后台做",
               onChange: (event) => setNewTask(event.target.value),
@@ -2194,7 +2195,7 @@ window.__ModuleLoader__.load({
               },
             }),
             h("input", {
-              className: "dshdot-text",
+              className: "dshbot-text",
               style: { maxWidth: "150px" },
               value: newRepeat,
               placeholder: "重复 day 09:00",
@@ -2206,24 +2207,24 @@ window.__ModuleLoader__.load({
             }),
             h("button", {
               type: "button",
-              className: "dshdot-btn",
+              className: "dshbot-btn",
               disabled: busy || newTask.trim().length === 0,
               onClick: addTask,
             }, "派给它")),
-          h("div", { className: "dshdot-note" },
+          h("div", { className: "dshbot-note" },
             "执行器：" + worker.state + (worker.reason === "" ? "" : "（" + worker.reason + "）")
             + " · 今日已跑 " + worker.runsToday + " 次"),
           tasks.length === 0
-            ? h("div", { className: "dshdot-note" }, "队列是空的。")
+            ? h("div", { className: "dshbot-note" }, "队列是空的。")
             : taskGroups.map((group) => (group.items.length === 0
                 ? null
-                : h("div", { key: group.key, className: "dshdot-group" },
-                    h("span", { className: "dshdot-grouptitle" }, group.title + " · " + group.items.length),
-                    h("ul", { className: "dshdot-list" }, group.items.map((task) => h("li", {
+                : h("div", { key: group.key, className: "dshbot-group" },
+                    h("span", { className: "dshbot-grouptitle" }, group.title + " · " + group.items.length),
+                    h("ul", { className: "dshbot-list" }, group.items.map((task) => h("li", {
                       key: task.id,
-                      className: "dshdot-item",
+                      className: "dshbot-item",
                     },
-                      h("span", { className: "dshdot-tag" }, taskStateLabel(task.state)),
+                      h("span", { className: "dshbot-tag" }, taskStateLabel(task.state)),
                       // The button appears when there is something to approve:
                       // either the job is parked at a boundary, or a rule is
                       // holding it back. "Already approved" and "the user raised
@@ -2232,7 +2233,7 @@ window.__ModuleLoader__.load({
                       task.state === "awaiting" || (task.approved !== true && task.source !== "user")
                         ? h("button", {
                             type: "button",
-                            className: "dshdot-tool",
+                            className: "dshbot-tool",
                             disabled: busy,
                             title: task.state === "awaiting"
                               ? "它停在这里等你，放行后继续做"
@@ -2250,10 +2251,10 @@ window.__ModuleLoader__.load({
                           "下次 " + new Date(task.dueAt).toLocaleString()),
                         task.result === "" ? null : h("span", { style: { color: "var(--dsw-alias-label-secondary)", overflowWrap: "anywhere" } }, "→ " + task.result),
                         task.error === "" ? null : h("span", { style: { color: "var(--dsw-alias-state-error-primary)", overflowWrap: "anywhere" } }, "✗ " + task.error)))))))),
-          h("div", { className: "dshdot-row" },
-            h("button", { type: "button", className: "dshdot-btn", disabled: busy, onClick: poke },
+          h("div", { className: "dshbot-row" },
+            h("button", { type: "button", className: "dshbot-btn", disabled: busy, onClick: poke },
               busy ? "在跑…" : "让它现在做一件"))),
-        h("div", { className: "dshdot-note" },
+        h("div", { className: "dshbot-note" },
           "常驻在 Host 进程 · 数据在 DSH_HOME/dot/dot.json · 心跳 " + ago(snapshot.heartbeatAt))));
     }
 
@@ -2278,9 +2279,9 @@ window.__ModuleLoader__.load({
           : (dots.find((dot) => dot.id === fixedId) ?? null);
 
       if (snapshot === null) {
-        return h("div", { className: "dshdot" },
+        return h("div", { className: "dshbot" },
           h("style", null, CSS),
-          h("div", { className: "dshdot-empty" }, state.kind === "error" ? "读不到 Host 端状态，插件可能已停用。" : "正在连接…"));
+          h("div", { className: "dshbot-empty" }, state.kind === "error" ? "读不到 Host 端状态，插件可能已停用。" : "正在连接…"));
       }
 
       if (view === "settings") {
@@ -2310,7 +2311,7 @@ window.__ModuleLoader__.load({
         types,
         state,
         onEnter: async (id) => {
-          const result = await call("/api/dot.manage", { action: "select", id });
+          const result = await call("/api/bot.manage", { action: "select", id });
           if (result.error === undefined) await refresh();
           setView("chat");
         },
@@ -2336,7 +2337,7 @@ window.__ModuleLoader__.load({
         const controller = new AbortController();
         const poll = async () => {
           try {
-            const response = await fetch("/api/dot.state", {
+            const response = await fetch("/api/bot.state", {
               cache: "no-store",
               headers: { accept: "application/json" },
               signal: controller.signal,

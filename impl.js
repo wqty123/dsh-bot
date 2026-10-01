@@ -1,14 +1,14 @@
 /**
- * Dot — a resident agent entity for the DeepSeek Harness.
+ * Bot — a resident agent entity for the DeepSeek Harness.
  *
- * Unlike a session, Dot is not owned by a conversation: its instances, their
+ * Unlike a session, a bot is not owned by a conversation: its instances, their
  * transcripts, and the shared memory and task queue live in one durable store
  * outside the session log, so every session reads and writes the same entity.
  * This half is the Host: it owns the store, the background executor, the
  * liveness heartbeat, the model-facing tools, and the authenticated routes the
  * Web panel reads and talks to.
  *
- * @module dsh-dot
+ * @module dsh-bot
  */
 
 import { execFile } from "node:child_process";
@@ -18,7 +18,7 @@ import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const name = "dot";
+export const name = "bot";
 export const inject = ["tools", "connection", "llm", "agentDefaultModel"];
 
 /** Entries kept per store; older entries are dropped from the tail. */
@@ -55,7 +55,7 @@ function normalizeMemorySource(raw, fallback) {
  * Two tiers, because collapsing them loses the useful half. The first is a hard
  * floor: identity numbers, credentials, card numbers. Those are refused no
  * matter what the user has switched on — the model never needs them to do the
- * work, and the whole point of `dot_secret` is that a secret can be *used*
+ * work, and the whole point of `bot_secret` is that a secret can be *used*
  * without being *known*.
  *
  * The second is a judgement call that belongs to the user: health, finances,
@@ -135,11 +135,11 @@ const DOT_PERMISSIONS = ["full", "readonly", "chat"];
  */
 const WORKER_TICK_MS = 5_000;
 
-/** Every Dot starts with this name; the user renames from settings after that. */
+/** Every bot starts with this name; the user renames from settings after that. */
 const DEFAULT_DOT_NAME = "屿";
 
 /**
- * The kinds of Dot that ship with the plugin. A user may add their own; these
+ * The kinds of bot that ship with the plugin. A user may add their own; these
  * four are always restored if a store is missing them, so they cannot be lost.
  */
 const DEFAULT_TYPES = [
@@ -539,7 +539,7 @@ async function mcpListTools(server) {
   await mcpCall(server, "initialize", {
     protocolVersion: "2025-06-18",
     capabilities: {},
-    clientInfo: { name: "dot", version: "1.0.0" },
+    clientInfo: { name: "bot", version: "1.0.0" },
   }).catch((error) => {
     // A server that answers `tools/list` without a handshake is common enough
     // that refusing to try would be worse than trying twice.
@@ -602,8 +602,8 @@ const NEVER_READABLE = [
 
 /** Path fragments that are somebody's secrets, not a resident's reading list. */
 const SECRET_HINTS = [
-  "\\dot\\dot.json",
-  "/dot/dot.json",
+  "\\bot\\bot.json",
+  "/bot/bot.json",
   "\\.env",
   "/.env",
   "credentials",
@@ -691,14 +691,14 @@ function workspaceVerdict(toolName, args, workspace) {
       if (value.includes(hint.replaceAll("/", "\\").toLowerCase())) {
         return {
           decision: "refused",
-          reason: "那里有凭据或整个记忆库。要它用凭据，走 dot_secret；要看记忆，走 dot_recall。",
+          reason: "那里有凭据或整个记忆库。要它用凭据，走 bot_secret；要看记忆，走 bot_recall。",
         };
       }
     }
     if (home !== "" && value.includes(home.replaceAll("/", "\\").toLowerCase())) {
       return {
         decision: "refused",
-        reason: "那是宿主自己的状态目录。要看实例状态，用 dot_status。",
+        reason: "那是宿主自己的状态目录。要看实例状态，用 bot_status。",
       };
     }
   }
@@ -743,7 +743,7 @@ function createSecretTool(ctx, store) {
   }
 
   return {
-    name: "dot_secret",
+    name: "bot_secret",
     description:
       "使用保存好的凭据，而从不看见它的内容。值只在本进程内部从凭据库送到虚拟桌面，"
       + "不会出现在你的上下文里。先用 action=list 看有哪些名字可用。",
@@ -1181,7 +1181,7 @@ const DEFAULT_TYPE = DEFAULT_TYPES[0].id;
 /** Absolute path of the durable store, honouring the profile's home override. */
 function stateFile() {
   const home = process.env.DSH_HOME ?? join(homedir(), ".dsh");
-  return join(home, "dot", "dot.json");
+  return join(home, "bot", "bot.json");
 }
 
 /**
@@ -1341,7 +1341,7 @@ function assetPath(name) {
 /** The directory every memory file lives under. */
 function memoryDir() {
   const home = process.env.DSH_HOME ?? join(homedir(), ".dsh");
-  return join(home, "dot", "memory");
+  return join(home, "bot", "memory");
 }
 
 /** Root files, in the order they are presented. Anything else is deferred. */
@@ -1597,7 +1597,7 @@ async function renderMemoryForPrompt() {
  */
 function defaultWorkspace(dotId) {
   const home = process.env.DSH_HOME ?? join(homedir(), ".dsh");
-  return join(home, "dot", "workspaces", dotId);
+  return join(home, "bot", "workspaces", dotId);
 }
 
 function mimeOf(path) {
@@ -1613,7 +1613,7 @@ function nowIso() {
 }
 
 /**
- * One kind of Dot. A user may add their own; the shipped four are marked so a
+ * One kind of bot. A user may add their own; the shipped four are marked so a
  * store that somehow lost them can be repaired.
  */
 function normalizeType(raw) {
@@ -1678,7 +1678,7 @@ function normalizeMessages(raw) {
         typeof message === "object" &&
         typeof message.id === "string" &&
         typeof message.text === "string" &&
-        (message.role === "user" || message.role === "dot"),
+        (message.role === "user" || message.role === "bot"),
     )
     .map((message) => ({
       id: message.id,
@@ -1889,7 +1889,7 @@ function normalizeTask(raw) {
 
 /**
  * Accept only the shape this module writes. A version-1 store (one identity,
- * no instances) migrates by giving that entity a Dot to live in; its memory and
+ * no instances) migrates by giving that entity a bot to live in; its memory and
  * task queue were always store-wide and carry over untouched.
  */
 function normalize(raw) {
@@ -1940,7 +1940,7 @@ function normalize(raw) {
       .map(normalizeAgendaEntry);
   }
 
-  // Kinds come first: a Dot's kind is validated against them, and a store that
+  // Kinds come first: a the resident's kind is validated against them, and a store that
   // lost one of the shipped kinds gets it back so there is always something
   // usable to create.
   if (Array.isArray(raw.types)) {
@@ -2880,7 +2880,7 @@ function createStore(file) {
       if (forbidden !== null) {
         throw new Error(
           `${forbidden}不该写进记忆——记忆是永久的，而且本来就有办法用它而不记下它。`
-          + `要使用凭据请走 dot_secret；要看你的记录请走 dot_recall。`,
+          + `要使用凭据请走 bot_secret；要看你的记录请走 bot_recall。`,
         );
       }
       const sensitive = sensitiveMemoryKind(body);
@@ -3262,7 +3262,7 @@ function createStore(file) {
     snapshot(dotId, options) {
       const current = dotId === undefined || dotId === "" ? activeDot() : dotById(dotId);
       // The tool view omits the transcript: it is long, and the model reading
-      // the status does not need another Dot's conversation.
+      // the status does not need another the resident's conversation.
       const withMessages = options === undefined || options.withMessages !== false;
       return {
         identity: {
@@ -3407,7 +3407,7 @@ const MEMORY_ENTRY_SCHEMA = {
   required: ["id", "kind", "text", "at", "source", "sensitive", "path", "ageDays", "stale"],
 };
 
-/** One Dot instance, as listed and as schematized. */
+/** One bot instance, as listed and as schematized. */
 const DOT_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -3612,7 +3612,7 @@ const WORKER_SCHEMA = {
   required: ["state", "reason", "runsToday", "updatedAt"],
 };
 
-/** The shared text-only rendering of any Dot tool result. */
+/** The shared text-only rendering of any bot tool result. */
 function text(value) {
   return [{ type: "text", text: value }];
 }
@@ -3764,14 +3764,14 @@ async function answerTurn(ctx, store, record, text, options) {
 
   // Memory now comes from the tree on disk rather than a list in the store:
   // root files in full, everything else by name and description. The store's
-  // rows are still what the panel shows and what `dot_recall` searches, so the
+  // rows are still what the panel shows and what `bot_recall` searches, so the
   // two views never disagree about what exists.
   const memory = await renderMemoryForPrompt();
   const tasks = await store.listTasks();
   const system = composeSystem(record, memory, tasks.slice(0, 8), store.transcript(record.id, (store.settings().limits ?? LIMIT_DEFAULTS).recallMessages));
 
   const answer = await runModel(ctx, settings.model ?? record.model, system, text, settings.signal, settings.images);
-  const saved = await store.appendMessage(record.id, "dot", answer.text, answer.meta);
+  const saved = await store.appendMessage(record.id, "bot", answer.text, answer.meta);
   return { answer, saved };
 }
 
@@ -5045,7 +5045,7 @@ function createWorker(store, ctx) {
 }
 
 /**
- * Register Dot's durable instances, transcript, memory, task queue, liveness,
+ * Register the resident's durable instances, transcript, memory, task queue, liveness,
  * and background executor for this Harness process.
  * @param ctx - Context carrying the tool registry, the client fetch fence, and
  *   the LLM the resident answers and works through.
@@ -5083,7 +5083,7 @@ export function apply(ctx) {
   });
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.state",
+    path: "/api/bot.state",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5099,7 +5099,7 @@ export function apply(ctx) {
           worker: worker.snapshot(),
           autonomy: autonomy.snapshot(),
           briefing: briefing.snapshot(),
-          // 和 dot_status 里的同一个答案，这样面板不必自己推。
+          // 和 bot_status 里的同一个答案，这样面板不必自己推。
           model: (() => {
             const active = store.dotRecord(requested);
             const picked = resolveModelChoice(ctx, active === undefined ? null : active.model);
@@ -5117,7 +5117,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.worker",
+    path: "/api/bot.worker",
     methods: ["GET", "POST"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5158,7 +5158,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.chat",
+    path: "/api/bot.chat",
     methods: ["POST"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5174,7 +5174,7 @@ export function apply(ctx) {
 
       const dotId = typeof body.dotId === "string" && body.dotId !== "" ? body.dotId : store.activeDotId();
       const record = store.dotRecord(dotId);
-      if (record === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+      if (record === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
 
       // Text attachments are folded into the turn; the transcript keeps only
       // their names, which is what the trace view shows.
@@ -5217,7 +5217,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.inbound",
+    path: "/api/bot.inbound",
     methods: ["POST"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5250,7 +5250,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.templates",
+    path: "/api/bot.templates",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: async () => Response.json(
@@ -5270,7 +5270,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.manage",
+    path: "/api/bot.manage",
     methods: ["POST"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5290,42 +5290,42 @@ export function apply(ctx) {
       }
       if (action === "select") {
         const selected = await store.selectDot(id);
-        if (selected === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (selected === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, dotId: selected, snapshot: store.snapshot(selected) });
       }
       if (action === "rename") {
         const dot = await store.renameDot(id, body.name);
-        if (dot === undefined) return Response.json({ error: "名字不能为空，或 Dot 不存在" }, { status: 400 });
+        if (dot === undefined) return Response.json({ error: "名字不能为空，或 bot 不存在" }, { status: 400 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "type") {
         const dot = await store.setDotType(id, body.type);
-        if (dot === undefined) return Response.json({ error: "类型不合法，或 Dot 不存在" }, { status: 400 });
+        if (dot === undefined) return Response.json({ error: "类型不合法，或 bot 不存在" }, { status: 400 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "model") {
         const dot = await store.setDotModel(id, body.model ?? null);
-        if (dot === undefined) return Response.json({ error: "模型不合法，或 Dot 不存在" }, { status: 400 });
+        if (dot === undefined) return Response.json({ error: "模型不合法，或 bot 不存在" }, { status: 400 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "permission") {
         const dot = await store.setDotPermission(id, body.permission);
-        if (dot === undefined) return Response.json({ error: "权限不合法，或 Dot 不存在" }, { status: 400 });
+        if (dot === undefined) return Response.json({ error: "权限不合法，或 bot 不存在" }, { status: 400 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "pin") {
         const dot = await store.setDotPinned(id, body.pinned);
-        if (dot === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (dot === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "pause") {
         const dot = await store.setDotPaused(id, body.paused);
-        if (dot === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (dot === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "workspace") {
         const outcome = await store.setDotWorkspace(id, body.workspace);
-        if (outcome === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (outcome === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         if (outcome.failed !== undefined) {
           return Response.json({ error: `这个目录用不了：${outcome.failed}` }, { status: 400 });
         }
@@ -5333,12 +5333,12 @@ export function apply(ctx) {
       }
       if (action === "environment") {
         const dot = await store.setDotEnvironment(id, { kind: body.kind, target: body.target });
-        if (dot === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (dot === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, snapshot: store.snapshot(dot.id) });
       }
       if (action === "reset") {
         const reset = await store.resetDot(id);
-        if (reset === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (reset === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, reset, snapshot: store.snapshot(id) });
       }
       if (action === "settings") {
@@ -5527,7 +5527,7 @@ export function apply(ctx) {
         const file = join(dir, name);
         await writeFile(file, bytes);
         const saved = await store.setAvatar(body.dotId, file);
-        if (saved === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (saved === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json(
           { ok: true, path: file, bytes: bytes.length, snapshot: store.snapshot(body.dotId ?? "") },
           { headers: { "cache-control": "no-store" } },
@@ -5625,12 +5625,12 @@ export function apply(ctx) {
       }
       if (action === "delete") {
         const next = await store.deleteDot(id);
-        if (next === undefined) return Response.json({ error: "至少要留一个 Dot" }, { status: 400 });
+        if (next === undefined) return Response.json({ error: "至少要留一个 bot" }, { status: 400 });
         return Response.json({ ok: true, dotId: next, snapshot: store.snapshot(next) });
       }
       if (action === "clear") {
         const cleared = await store.clearTranscript(id);
-        if (!cleared) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+        if (!cleared) return Response.json({ error: "没有这个 bot" }, { status: 404 });
         return Response.json({ ok: true, snapshot: store.snapshot(id) });
       }
       if (action === "task") {
@@ -5672,7 +5672,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.env",
+    path: "/api/bot.env",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: async () => Response.json(
@@ -5682,7 +5682,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.avatar",
+    path: "/api/bot.avatar",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: async () => {
@@ -5705,7 +5705,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.models",
+    path: "/api/bot.models",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: async () => {
@@ -5766,7 +5766,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.rewind",
+    path: "/api/bot.rewind",
     methods: ["POST"],
     requestBody: "buffered",
     fetch: async (request) => {
@@ -5780,7 +5780,7 @@ export function apply(ctx) {
       const dotId = typeof body.dotId === "string" && body.dotId !== "" ? body.dotId : store.activeDotId();
       const count = typeof body.count === "number" && Number.isFinite(body.count) ? body.count : 1;
       const outcome = await store.rewindMessages(dotId, count);
-      if (outcome === undefined) return Response.json({ error: "没有这个 Dot" }, { status: 404 });
+      if (outcome === undefined) return Response.json({ error: "没有这个 bot" }, { status: 404 });
       return Response.json(
         {
           ok: true,
@@ -5796,7 +5796,7 @@ export function apply(ctx) {
   }));
 
   ctx.effect(() => ctx.connection.fetch.register({
-    path: "/api/dot.types",
+    path: "/api/bot.types",
     methods: ["GET"],
     requestBody: "buffered",
     fetch: () => Response.json({ types: store.types() }, { headers: { "cache-control": "no-store" } }),
@@ -5809,9 +5809,9 @@ export function apply(ctx) {
   });
 
   ctx.tools.register({
-    name: "dot_status",
+    name: "bot_status",
     description:
-      "Read the Dot resident's liveness, its instances, and the shared queue and recent memory entries. Call it before claiming that Dot knows or remembers something.",
+      "Read the resident's liveness, its instances, and the shared queue and recent memory entries. Call it before claiming that the resident knows or remembers something.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
     output: {
       schema: {
@@ -5896,13 +5896,13 @@ export function apply(ctx) {
           },
         };
     },
-    presentCall: () => ({ card: "generic", title: "Read Dot status", kind: "read" }),
+    presentCall: () => ({ card: "generic", title: "Read bot status", kind: "read" }),
   });
 
   ctx.tools.register({
-    name: "dot_remember",
+    name: "bot_remember",
     description:
-      "Record one durable entry on the Dot resident. Entries outlive the session that wrote them and are readable from every later session, so record conclusions rather than narration. Write absolute dates (2026-04-28), never relative ones (today, last week): an entry is read long after it was written, and \"today\" means nothing by the time anyone reads it.",
+      "Record one durable entry on the resident. Entries outlive the session that wrote them and are readable from every later session, so record conclusions rather than narration. Write absolute dates (2026-04-28), never relative ones (today, last week): an entry is read long after it was written, and \"today\" means nothing by the time anyone reads it.",
     parameters: {
       type: "object",
       properties: {
@@ -5945,12 +5945,12 @@ export function apply(ctx) {
         required: ["id", "kind", "at", "source", "path", "memoryTotal"],
       },
       render: (_args, value) => text(
-        `Recorded ${value.kind} ${value.id} (${value.source}). Dot now holds ${value.memoryTotal} entries.`,
+        `Recorded ${value.kind} ${value.id} (${value.source}). The resident now holds ${value.memoryTotal} entries.`,
       ),
     },
     execute: async (args) => {
       const value = typeof args.text === "string" ? args.text.trim() : "";
-      if (value.length === 0) throw new Error("dot_remember requires non-empty text");
+      if (value.length === 0) throw new Error("bot_remember requires non-empty text");
       // The origin the model declared — not the id of whichever agent made the
       // call. The whole point is to tell a verified fact apart from something
       // read out of a page that might have been written to instruct it;
@@ -5969,16 +5969,16 @@ export function apply(ctx) {
     },
     presentCall: (args) => ({
       card: "generic",
-      title: "Remember on Dot",
+      title: "Remember on bot",
       kind: "other",
       rawInput: typeof args.text === "string" ? args.text : undefined,
     }),
   });
 
   ctx.tools.register({
-    name: "dot_recall",
+    name: "bot_recall",
     description:
-      "Search the Dot resident's recorded entries. Matching is literal over the entry text, so pass the words an entry is likely to contain rather than a question.",
+      "Search the resident's recorded entries. Matching is literal over the entry text, so pass the words an entry is likely to contain rather than a question.",
     parameters: {
       type: "object",
       properties: {
@@ -5999,7 +5999,7 @@ export function apply(ctx) {
         required: ["query", "matches"],
       },
       render: (_args, value) => text(value.matches.length === 0
-        ? `Dot holds nothing matching ${JSON.stringify(value.query)}.`
+        ? `The resident holds nothing matching ${JSON.stringify(value.query)}.`
         : [
             `${value.matches.length} entr${value.matches.length === 1 ? "y" : "ies"} matching ${JSON.stringify(value.query)}:`,
             summarizeMemory(value.matches),
@@ -6007,23 +6007,23 @@ export function apply(ctx) {
     },
     execute: async (args) => {
       const query = typeof args.query === "string" ? args.query.trim() : "";
-      if (query.length === 0) throw new Error("dot_recall requires a non-empty query");
+      if (query.length === 0) throw new Error("bot_recall requires a non-empty query");
       const requested = typeof args.limit === "number" && Number.isFinite(args.limit) ? Math.floor(args.limit) : 10;
       const limit = Math.min(Math.max(requested, 1), 50);
       return { query, matches: await store.searchMemory(query, limit) };
     },
     presentCall: (args) => ({
       card: "generic",
-      title: "Recall from Dot",
+      title: "Recall from bot",
       kind: "search",
       rawInput: typeof args.query === "string" ? args.query : undefined,
     }),
   });
 
   ctx.tools.register({
-    name: "dot_task",
+    name: "bot_task",
     description:
-      "Read or change the Dot resident's task queue. The queue is how work outlives the session that raised it: a resident works queued tasks in the background, highest priority first, and the outcome stays on the task. A task stays queued until the executor takes it, and stays open to edits until it is cancelled or finished.",
+      "Read or change the resident's task queue. The queue is how work outlives the session that raised it: a resident works queued tasks in the background, highest priority first, and the outcome stays on the task. A task stays queued until the executor takes it, and stays open to edits until it is cancelled or finished.",
     parameters: {
       type: "object",
       properties: {
@@ -6084,7 +6084,7 @@ export function apply(ctx) {
       let created;
       if (action === "add") {
         const title = typeof args.title === "string" ? args.title.trim() : "";
-        if (title.length === 0) throw new Error("dot_task action add requires a title");
+        if (title.length === 0) throw new Error("bot_task action add requires a title");
         created = await store.addTask(title, typeof args.note === "string" ? args.note : "", {
           priority: typeof args.priority === "number" ? Math.min(Math.max(Math.round(args.priority), 1), 5) : undefined,
           dueAt: typeof args.due_at === "string" && args.due_at.trim() !== "" ? args.due_at.trim() : null,
@@ -6093,7 +6093,7 @@ export function apply(ctx) {
           model: parseChoice(args.model, args.effort),
         });
       } else if (action === "update") {
-        if (id.length === 0) throw new Error("dot_task action update requires an id");
+        if (id.length === 0) throw new Error("bot_task action update requires an id");
         const edited = await store.editTask(id, {
           ...(typeof args.title === "string" ? { title: args.title } : {}),
           ...(typeof args.note === "string" ? { note: args.note } : {}),
@@ -6102,13 +6102,13 @@ export function apply(ctx) {
           ...(typeof args.repeat === "string" ? { repeat: parseRepeat(args.repeat) } : {}),
             ...(typeof args.continuity === "string" ? { continuity: args.continuity } : {}),
         });
-        if (edited === undefined) throw new Error(`no Dot task with id ${JSON.stringify(id)}`);
+        if (edited === undefined) throw new Error(`no bot task with id ${JSON.stringify(id)}`);
       } else if (action === "cancel") {
-        if (id.length === 0) throw new Error("dot_task action cancel requires an id");
+        if (id.length === 0) throw new Error("bot_task action cancel requires an id");
         const cancelled = await store.cancelTask(id);
-        if (cancelled === undefined) throw new Error(`no Dot task with id ${JSON.stringify(id)}`);
+        if (cancelled === undefined) throw new Error(`no bot task with id ${JSON.stringify(id)}`);
       } else if (action !== "list") {
-        throw new Error(`unknown dot_task action ${JSON.stringify(action)}`);
+        throw new Error(`unknown bot_task action ${JSON.stringify(action)}`);
       }
       const tasks = await store.listTasks();
       // Put the task this call created first, so the result can name it.
@@ -6123,19 +6123,19 @@ export function apply(ctx) {
       card: "generic",
       title:
         args.action === "add"
-          ? "Queue a Dot task"
+          ? "Queue a bot task"
           : args.action === "update"
-            ? "Update a Dot task"
+            ? "Update a bot task"
             : args.action === "cancel"
-              ? "Cancel a Dot task"
-              : "Read the Dot queue",
+              ? "Cancel a bot task"
+              : "Read the bot queue",
       kind: "other",
       rawInput: args.title ?? args.id,
     }),
   });
 
   ctx.tools.register({
-    name: "dot_connector",
+    name: "bot_connector",
     description:
       "Reach one of the outbound connections the user configured: a chat channel, a webhook, an API. The plugin ships no built-in integrations — every connection was entered by the user, and only those the current bot is allowed to use appear here. Call it with action list before claiming you can reach anything.",
     parameters: {
@@ -6183,10 +6183,10 @@ export function apply(ctx) {
       if (args.action === "list") {
         return { action: "list", connectors: available, sent: false, status: 0, detail: "" };
       }
-      if (args.action !== "send") throw new Error(`unknown dot_connector action ${JSON.stringify(args.action)}`);
+      if (args.action !== "send") throw new Error(`unknown bot_connector action ${JSON.stringify(args.action)}`);
       const id = typeof args.id === "string" ? args.id : "";
       const message = typeof args.message === "string" ? args.message.trim() : "";
-      if (id === "" || message === "") throw new Error("dot_connector action send requires id and message");
+      if (id === "" || message === "") throw new Error("bot_connector action send requires id and message");
       const connector = store.connectorById(id);
       if (connector === undefined) throw new Error(`no connection with id ${JSON.stringify(id)}`);
       if (!connectorAllows(connector, dotId)) {
@@ -6231,7 +6231,7 @@ export function apply(ctx) {
   // about dinner" from three features into one: an instant, a sentence, and a
   // way to say so when the instant arrives.
   ctx.tools.register({
-    name: "dot_agenda",
+    name: "bot_agenda",
     description:
       "记下某件应该在某个时刻发生的事——日程、提醒、约会、要办的事。这就是你的时间感："
       + "「规划议程」「安排晚餐」「催我处理家装」都是同一件事，记住某个时刻该做什么。"
